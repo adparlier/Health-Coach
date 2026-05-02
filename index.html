@@ -311,7 +311,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
 var MEALS=['Breakfast','Lunch','Dinner','Snack'];
 var selMeal='Breakfast',selFood=null,tDays=7,sit='home';
 var log={Breakfast:[],Lunch:[],Dinner:[],Snack:[]};
-var syncURL='',scanActive=false;
+var syncURL='https://script.google.com/macros/s/AKfycbwoCezt8eRCmcNdtXv_PCocoNQ3dEmFsIUxhB5Xg5di8OgXJtO_uO5iINsAs1999c0/exec',scanActive=false;
 
 // ── Storage ──────────────────────────────────────────────────────
 function tk(){return 'nl_'+new Date().toDateString();}
@@ -325,7 +325,7 @@ function addHist(f){var h=getHist(),k=f.name.toLowerCase().trim();h[k]={name:f.n
 function getFavs(){var s=localStorage.getItem('nl_f');return s?JSON.parse(s):{};}
 function toggleFav(k,f){var fv=getFavs();if(fv[k])delete fv[k];else fv[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g'};localStorage.setItem('nl_f',JSON.stringify(fv));}
 function isFav(k){return !!getFavs()[k];}
-function getSyncURL(){return localStorage.getItem('nl_sync')||'';}
+function getSyncURL(){return localStorage.getItem('nl_sync')||'https://script.google.com/macros/s/AKfycbwoCezt8eRCmcNdtXv_PCocoNQ3dEmFsIUxhB5Xg5di8OgXJtO_uO5iINsAs1999c0/exec';}
 function saveSyncURL(u){localStorage.setItem('nl_sync',u);syncURL=u;}
 function clearDay(){if(!confirm('Clear all food logged today?'))return;log={Breakfast:[],Lunch:[],Dinner:[],Snack:[]};saveDay();renderAll();}
 function allDays(){
@@ -396,7 +396,11 @@ function showSyncSetup(){
 // ── Init ─────────────────────────────────────────────────────────
 document.getElementById('dp').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 syncURL=getSyncURL();
-loadDay();renderAll();updateSyncBar();
+loadDay();
+renderAll();
+updateSyncBar();
+// Auto-load from cloud on startup
+syncNow();
 
 // ── Page nav ─────────────────────────────────────────────────────
 function showPage(n,btn){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('active');});document.getElementById('page-'+n).classList.add('active');btn.classList.add('active');document.getElementById('fab').className=n==='log'?'fab':'fab hid';if(n==='suggest')renderSuggest();if(n==='history')renderHistory();if(n==='trends')renderTrends();}
@@ -521,7 +525,7 @@ function processSearchResults(products, q){
       if(word.length>2 && nm.indexOf(word)>-1) score += 2000;
     });
     // Penalize if name has non-ASCII chars (likely foreign)
-    if(/[^ -]/.test(p.product_name||'')) score -= 3000;
+    if((p.product_name||'').split('').some(function(c){return c.charCodeAt(0)>127;})) score -= 3000;
     p._score = score;
     return p;
   });
