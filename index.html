@@ -827,62 +827,102 @@ function showConf(f,scanned){
 function editFood(meal, idx){
   var f = log[meal][idx];
   if(!f) return;
-  // Store original base nutrition (per serving)
-  var origServings = f._servings || 1;
-  var base = {
-    cal: Math.round(f.cal / origServings),
-    carbs: Math.round(f.carbs / origServings),
-    fiber: Math.round(f.fiber / origServings),
-    protein: Math.round(f.protein / origServings),
-    sodium: Math.round(f.sodium / origServings),
-    sugar: Math.round((f.sugar||0) / origServings)
-  };
   var mb = cm2();
-  aTitle(mb, 'Edit Serving', 'Adjust how much you ate');
+  aTitle(mb, 'Edit Food', 'Adjust any values directly');
   // Food name display
   var nd = document.createElement('div');
   nd.className = 'cc';
-  nd.style.marginBottom = '14px';
-  nd.innerHTML = '<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr2">'+f.brand+'</div>':'')+'<div style="font-size:12px;color:var(--t2);margin-top:6px;">'+base.cal+' cal per serving</div>';
+  nd.style.marginBottom = '16px';
+  nd.innerHTML = '<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr2">'+f.brand+'</div>':'');
   mb.appendChild(nd);
-  // Serving input
+  // Serving shortcut row
+  var srlbl = document.createElement('div');
+  srlbl.style.cssText = 'font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;';
+  srlbl.textContent = 'Quick adjust by servings';
+  mb.appendChild(srlbl);
   var sr = document.createElement('div');
   sr.className = 'sv2';
+  sr.style.marginBottom = '16px';
   var sl = document.createElement('label');
   sl.textContent = 'Servings:';
   var si = document.createElement('input');
   si.type = 'number';
   si.id = 'edit-srv';
-  si.value = origServings;
+  si.value = f._servings || 1;
   si.min = '0.25';
   si.max = '20';
   si.step = '0.25';
   si.className = 'si2';
+  var origServings = f._servings || 1;
+  var base = {
+    cal: Math.round(f.cal/origServings),
+    carbs: Math.round(f.carbs/origServings),
+    fiber: Math.round(f.fiber/origServings),
+    protein: Math.round(f.protein/origServings),
+    sodium: Math.round(f.sodium/origServings),
+    sugar: Math.round((f.sugar||0)/origServings)
+  };
   var su = document.createElement('span');
   su.className = 'su2';
-  su.textContent = 'x '+base.cal+' cal each';
-  sr.appendChild(sl); sr.appendChild(si); sr.appendChild(su);
+  su.textContent = 'x '+base.cal+' cal';
+  sr.appendChild(sl);sr.appendChild(si);sr.appendChild(su);
   mb.appendChild(sr);
-  // Live preview
-  var preview = document.createElement('div');
-  preview.id = 'edit-preview';
-  preview.style.cssText = 'font-size:13px;color:var(--t2);margin-bottom:14px;padding:10px;background:var(--sf2);border-radius:10px;border:1px solid var(--bd);';
-  preview.textContent = 'Total: '+f.cal+' cal';
-  mb.appendChild(preview);
-  si.oninput = function(){
-    var s = parseFloat(si.value)||1;
-    document.getElementById('edit-preview').textContent = 'Total: '+Math.round(base.cal*s)+' cal | '+Math.round(base.carbs*s)+'g carbs | '+Math.round(base.protein*s)+'g protein';
-  };
+  // Apply servings button
+  mb.appendChild(mkBtn('sec', 'Apply Servings to Fields ↓', function(){
+    var s = parseFloat(document.getElementById('edit-srv').value)||1;
+    document.getElementById('e-cal').value = Math.round(base.cal*s);
+    document.getElementById('e-carbs').value = Math.round(base.carbs*s);
+    document.getElementById('e-fiber').value = Math.round(base.fiber*s);
+    document.getElementById('e-protein').value = Math.round(base.protein*s);
+    document.getElementById('e-sodium').value = Math.round(base.sodium*s);
+    document.getElementById('e-sugar').value = Math.round(base.sugar*s);
+  }));
+  // Divider
+  var div2 = document.createElement('div');
+  div2.style.cssText = 'border-top:1px solid var(--bd);margin:14px 0 12px;';
+  mb.appendChild(div2);
+  var mlbl = document.createElement('div');
+  mlbl.style.cssText = 'font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;';
+  mlbl.textContent = 'Or edit individual macros';
+  mb.appendChild(mlbl);
+  // Macro fields grid
+  var fields = [
+    {id:'e-cal',   lbl:'Calories',   val:f.cal},
+    {id:'e-carbs', lbl:'Carbs (g)',   val:f.carbs},
+    {id:'e-fiber', lbl:'Fiber (g)',   val:f.fiber},
+    {id:'e-protein',lbl:'Protein (g)',val:f.protein},
+    {id:'e-sodium',lbl:'Sodium (mg)', val:f.sodium},
+    {id:'e-sugar', lbl:'Sugar (g)',   val:f.sugar||0}
+  ];
+  var grid = document.createElement('div');
+  grid.className = 'mgrid2';
+  fields.forEach(function(field){
+    var wrap = document.createElement('div');
+    wrap.className = 'nutr-inp fw';
+    var lbl = document.createElement('label');
+    lbl.textContent = field.lbl;
+    var inp = document.createElement('input');
+    inp.type = 'number';
+    inp.id = field.id;
+    inp.value = field.val;
+    inp.min = '0';
+    inp.className = 'nutr-inp';
+    wrap.appendChild(lbl);
+    wrap.appendChild(inp);
+    grid.appendChild(wrap);
+  });
+  mb.appendChild(grid);
   mb.appendChild(mkBtn('pri', '\u2713 Save Changes', function(){
     var s = parseFloat(document.getElementById('edit-srv').value)||1;
     log[meal][idx] = {
-      name: f.name, brand: f.brand||'',
-      cal: Math.round(base.cal*s),
-      carbs: Math.round(base.carbs*s),
-      fiber: Math.round(base.fiber*s),
-      protein: Math.round(base.protein*s),
-      sodium: Math.round(base.sodium*s),
-      sugar: Math.round(base.sugar*s),
+      name: f.name,
+      brand: f.brand||'',
+      cal: parseInt(document.getElementById('e-cal').value)||0,
+      carbs: parseInt(document.getElementById('e-carbs').value)||0,
+      fiber: parseInt(document.getElementById('e-fiber').value)||0,
+      protein: parseInt(document.getElementById('e-protein').value)||0,
+      sodium: parseInt(document.getElementById('e-sodium').value)||0,
+      sugar: parseInt(document.getElementById('e-sugar').value)||0,
       scanned: f.scanned||false,
       _servings: s
     };
