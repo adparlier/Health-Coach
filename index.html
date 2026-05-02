@@ -436,9 +436,11 @@ function renderAll(){
       left.innerHTML='<div class="fn">'+f.name+'</div>'+(f.brand?'<div class="fbr">'+f.brand+'</div>':'')+'<div class="fch"><span class="ch">🍞 '+f.carbs+'g</span><span class="ch fi">🌿 '+f.fiber+'g</span><span class="ch">💪 '+f.protein+'g</span><span class="ch">🧂 '+f.sodium+'mg</span>'+(f.sugar>0?'<span class="ch su">🍬 '+f.sugar+'g</span>':'')+'</div>';
       var right=document.createElement('div');right.className='fr';
       right.innerHTML='<div class="fca">'+f.cal+'</div><div class="fcl">cal</div>';
+      var eb=document.createElement('button');eb.className='db';eb.style.fontSize='13px';eb.textContent='✏️';
+      (function(m,idx){eb.onclick=function(){editFood(m,idx);};})(meal,i);
       var db=document.createElement('button');db.className='db';db.textContent='×';
       (function(m,idx){db.onclick=function(){log[m].splice(idx,1);saveDay();renderAll();};})(meal,i);
-      right.appendChild(db);card.appendChild(left);card.appendChild(right);div.appendChild(card);
+      right.appendChild(eb);right.appendChild(db);card.appendChild(left);card.appendChild(right);div.appendChild(card);
     });}
     mc.appendChild(div);
   });
@@ -820,6 +822,74 @@ function showConf(f,scanned){
   sr.appendChild(sl);sr.appendChild(si);sr.appendChild(su);mb.appendChild(sr);
   mb.appendChild(mkBtn('pri','✓ Add to '+selMeal,addFood));
   mb.appendChild(mkBtn('sec','← Back',showMS));
+}
+
+function editFood(meal, idx){
+  var f = log[meal][idx];
+  if(!f) return;
+  // Store original base nutrition (per serving)
+  var origServings = f._servings || 1;
+  var base = {
+    cal: Math.round(f.cal / origServings),
+    carbs: Math.round(f.carbs / origServings),
+    fiber: Math.round(f.fiber / origServings),
+    protein: Math.round(f.protein / origServings),
+    sodium: Math.round(f.sodium / origServings),
+    sugar: Math.round((f.sugar||0) / origServings)
+  };
+  var mb = cm2();
+  aTitle(mb, 'Edit Serving', 'Adjust how much you ate');
+  // Food name display
+  var nd = document.createElement('div');
+  nd.className = 'cc';
+  nd.style.marginBottom = '14px';
+  nd.innerHTML = '<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr2">'+f.brand+'</div>':'')+'<div style="font-size:12px;color:var(--t2);margin-top:6px;">'+base.cal+' cal per serving</div>';
+  mb.appendChild(nd);
+  // Serving input
+  var sr = document.createElement('div');
+  sr.className = 'sv2';
+  var sl = document.createElement('label');
+  sl.textContent = 'Servings:';
+  var si = document.createElement('input');
+  si.type = 'number';
+  si.id = 'edit-srv';
+  si.value = origServings;
+  si.min = '0.25';
+  si.max = '20';
+  si.step = '0.25';
+  si.className = 'si2';
+  var su = document.createElement('span');
+  su.className = 'su2';
+  su.textContent = 'x '+base.cal+' cal each';
+  sr.appendChild(sl); sr.appendChild(si); sr.appendChild(su);
+  mb.appendChild(sr);
+  // Live preview
+  var preview = document.createElement('div');
+  preview.id = 'edit-preview';
+  preview.style.cssText = 'font-size:13px;color:var(--t2);margin-bottom:14px;padding:10px;background:var(--sf2);border-radius:10px;border:1px solid var(--bd);';
+  preview.textContent = 'Total: '+f.cal+' cal';
+  mb.appendChild(preview);
+  si.oninput = function(){
+    var s = parseFloat(si.value)||1;
+    document.getElementById('edit-preview').textContent = 'Total: '+Math.round(base.cal*s)+' cal | '+Math.round(base.carbs*s)+'g carbs | '+Math.round(base.protein*s)+'g protein';
+  };
+  mb.appendChild(mkBtn('pri', '\u2713 Save Changes', function(){
+    var s = parseFloat(document.getElementById('edit-srv').value)||1;
+    log[meal][idx] = {
+      name: f.name, brand: f.brand||'',
+      cal: Math.round(base.cal*s),
+      carbs: Math.round(base.carbs*s),
+      fiber: Math.round(base.fiber*s),
+      protein: Math.round(base.protein*s),
+      sodium: Math.round(base.sodium*s),
+      sugar: Math.round(base.sugar*s),
+      scanned: f.scanned||false,
+      _servings: s
+    };
+    saveDay(); renderAll(); closeModal();
+  }));
+  mb.appendChild(mkBtn('sec', 'Cancel', closeModal));
+  document.getElementById('ov').classList.add('open');
 }
 
 function addFood(){
