@@ -276,6 +276,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
         <button class="si" onclick="setSit('snack',this)"><div class="sii">🍎</div><span>Just a Snack</span></button>
       </div>
     </div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Live Advice</span></div><div id="live-advice"></div></div>
     <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Today's Picture</span></div><div id="ds"></div></div>
     <div class="sec" style="margin:0 0 80px;"><div class="sh2"><span class="st" id="sgtitle">Suggestions</span></div><div id="sglist"></div></div>
   </div>
@@ -399,7 +400,6 @@ syncURL=getSyncURL();
 loadDay();
 renderAll();
 updateSyncBar();
-// Auto-load from cloud on startup
 syncNow();
 
 // ── Page nav ─────────────────────────────────────────────────────
@@ -486,59 +486,64 @@ function showSearch(){
   setTimeout(function(){var el=document.getElementById('si2');if(el)el.focus();},100);
 }
 
+
+function processSearchResults(products, q){
+  var valid=products.filter(function(p){
+    var n=p.nutriments||{},nm=(p.product_name||'').trim();
+    return nm.length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);
+  });
+  var qLower=q.toLowerCase();
+  valid=valid.map(function(p){
+    var score=p.unique_scans_n||0,nm=(p.product_name||'').toLowerCase();
+    var countries=(p.countries_tags||[]).join(',').toLowerCase();
+    if(countries.indexOf('en:united-states')>-1) score+=10000;
+    if(countries.indexOf('en:canada')>-1) score+=5000;
+    if(countries.indexOf('en:united-kingdom')>-1) score+=3000;
+    qLower.split(' ').forEach(function(word){if(word.length>2&&nm.indexOf(word)>-1)score+=2000;});
+    if((p.product_name||'').split('').some(function(c){return c.charCodeAt(0)>127;})) score-=3000;
+    p._score=score;return p;
+  });
+  valid.sort(function(a,b){return b._score-a._score;});
+  var top=valid.slice(0,6);
+  if(!top.length){showNF(q);return;}
+  window._res=top.map(parseOFF);
+  showRes(window._res);
+}
+
 function doSearch(){
   var inp=document.getElementById('si2');
   var q=inp?inp.value.trim():'';
   if(!q)return;
   showLoad('Searching for '+q+'...');
-  // Try v2 first, fallback to cgi
-  var url='https://world.openfoodfacts.org/api/v2/search?search_terms='+encodeURIComponent(q)+'&page_size=20&fields=product_name,brands,nutriments,serving_size,serving_quantity,countries_tags,unique_scans_n&sort_by=unique_scans_n';
+  // Use OFF v2 search API - same CORS policy as barcode lookup which works
+  var url='https://world.openfoodfacts.org/api/v2/search?search_terms='+encodeURIComponent(q)+'&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity,product_quantity&sort_by=unique_scans_n';
   fetch(url)
-    .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r.json();})
-    .then(function(data){processSearchResults(data.products||[],q);})
-    .catch(function(){
-      fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=20&fields=product_name,brands,nutriments,serving_size,serving_quantity,countries_tags,unique_scans_n')
+    .then(function(r){
+      if(!r.ok)throw new Error('http '+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      var ps=(data.products||[]).filter(function(p){
+        var n=p.nutriments||{};
+        var nm=(p.product_name||'').trim();
+        return nm.length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);
+      }).slice(0,6);
+      if(!ps.length){showNF(q);return;}
+      window._res=ps.map(parseOFF);
+      showRes(window._res);
+    })
+    .catch(function(err){
+      // Try fallback endpoint
+      var url2='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity';
+      fetch(url2)
         .then(function(r){return r.json();})
-        .then(function(data){processSearchResults(data.products||[],q);})
+        .then(function(data){
+          var ps=(data.products||[]).filter(function(p){var n=p.nutriments||{};return(p.product_name||'').trim().length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']);}).slice(0,6);
+          if(!ps.length){showNF(q);return;}
+          window._res=ps.map(parseOFF);showRes(window._res);
+        })
         .catch(function(){showNF(q);});
     });
-}
-
-function processSearchResults(products, q){
-  // Filter: must have name and calories
-  var valid = products.filter(function(p){
-    var n=p.nutriments||{};
-    var nm=(p.product_name||'').trim();
-    return nm.length>0 && (n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);
-  });
-
-  // Score: prefer English/US products, penalize foreign language names
-  var qLower = q.toLowerCase();
-  valid = valid.map(function(p){
-    var score = p.unique_scans_n || 0;
-    var nm = (p.product_name||'').toLowerCase();
-    var countries = (p.countries_tags||[]).join(',').toLowerCase();
-    // Boost US/English products
-    if(countries.indexOf('en:united-states')>-1) score += 10000;
-    if(countries.indexOf('en:canada')>-1) score += 5000;
-    if(countries.indexOf('en:united-kingdom')>-1) score += 3000;
-    // Boost if name contains query words
-    qLower.split(' ').forEach(function(word){
-      if(word.length>2 && nm.indexOf(word)>-1) score += 2000;
-    });
-    // Penalize if name has non-ASCII chars (likely foreign)
-    if((p.product_name||'').split('').some(function(c){return c.charCodeAt(0)>127;})) score -= 3000;
-    p._score = score;
-    return p;
-  });
-
-  // Sort by score descending
-  valid.sort(function(a,b){return b._score - a._score;});
-
-  var top = valid.slice(0,6);
-  if(!top.length){showNF(q);return;}
-  window._res = top.map(parseOFF);
-  showRes(window._res);
 }
 
 function showNF(q){
@@ -579,13 +584,12 @@ function showRes(foods){
 }
 
 
-// ── Aldi Staples ─────────────────────────────────────────────────
 var ALDI_STAPLES = [
   {name:'Salmon Fillet (6oz)',brand:'Aldi / Seasons Choice',cal:280,carbs:0,fiber:0,protein:34,sodium:115,sugar:0,servingSize:170,servingUnit:'g'},
   {name:'Friendly Farms Plain Greek Yogurt',brand:'Aldi / Friendly Farms',cal:100,carbs:7,fiber:0,protein:17,sodium:65,sugar:6,servingSize:170,servingUnit:'g'},
   {name:'Friendly Farms Vanilla Greek Yogurt',brand:'Aldi / Friendly Farms',cal:140,carbs:20,fiber:0,protein:11,sodium:75,sugar:19,servingSize:170,servingUnit:'g'},
-  {name:'Southern Grove Almonds (Roasted Salted)',brand:'Aldi / Southern Grove',cal:170,carbs:6,fiber:3,protein:6,sodium:95,sugar:1,servingSize:28,servingUnit:'g'},
-  {name:'Rotisserie Chicken (whole)',brand:'Aldi',cal:180,carbs:0,fiber:0,protein:26,sodium:440,sugar:0,servingSize:113,servingUnit:'g'},
+  {name:'Southern Grove Almonds Roasted Salted',brand:'Aldi / Southern Grove',cal:170,carbs:6,fiber:3,protein:6,sodium:95,sugar:1,servingSize:28,servingUnit:'g'},
+  {name:'Rotisserie Chicken',brand:'Aldi',cal:180,carbs:0,fiber:0,protein:26,sodium:440,sugar:0,servingSize:113,servingUnit:'g'},
   {name:'Eggs Large (2 eggs)',brand:'Aldi / Goldhen',cal:140,carbs:0,fiber:0,protein:12,sodium:125,sugar:0,servingSize:100,servingUnit:'g'},
   {name:'Peanut Butter (2 tbsp)',brand:'Aldi / Peanut Delight',cal:190,carbs:7,fiber:2,protein:8,sodium:150,sugar:3,servingSize:32,servingUnit:'g'},
   {name:'Whole Grain Bread (1 slice)',brand:'Aldi / LOven Fresh',cal:90,carbs:17,fiber:2,protein:4,sodium:140,sugar:2,servingSize:38,servingUnit:'g'},
@@ -593,14 +597,15 @@ var ALDI_STAPLES = [
   {name:'Ground Beef 93% Lean (4oz)',brand:'Aldi / Never Any',cal:150,carbs:0,fiber:0,protein:25,sodium:75,sugar:0,servingSize:113,servingUnit:'g'},
   {name:'Chicken Breast (6oz)',brand:'Aldi / Never Any',cal:185,carbs:0,fiber:0,protein:40,sodium:85,sugar:0,servingSize:170,servingUnit:'g'},
   {name:'Sweet Potato (medium)',brand:'Fresh',cal:103,carbs:24,fiber:4,protein:2,sodium:41,sugar:7,servingSize:130,servingUnit:'g'},
-  {name:'Green Beans (1 cup)',brand:'Fresh / Canned',cal:31,carbs:7,fiber:3,protein:2,sodium:6,sugar:3,servingSize:100,servingUnit:'g'},
+  {name:'Green Beans (1 cup)',brand:'Fresh',cal:31,carbs:7,fiber:3,protein:2,sodium:6,sugar:3,servingSize:100,servingUnit:'g'},
   {name:'Brown Rice (1 cup cooked)',brand:'Generic',cal:216,carbs:45,fiber:4,protein:5,sodium:10,sugar:0,servingSize:202,servingUnit:'g'},
-  {name:'Black Beans (1/2 cup)',brand:'Canned',cal:110,carbs:20,fiber:7,protein:7,sodium:240,sugar:0,servingSize:130,servingUnit:'g'},
+  {name:'Black Beans (half cup)',brand:'Canned',cal:110,carbs:20,fiber:7,protein:7,sodium:240,sugar:0,servingSize:130,servingUnit:'g'},
   {name:'Olive Oil (1 tbsp)',brand:'Aldi / Carlini',cal:120,carbs:0,fiber:0,protein:0,sodium:0,sugar:0,servingSize:14,servingUnit:'g'},
   {name:'Banana (medium)',brand:'Fresh',cal:105,carbs:27,fiber:3,protein:1,sodium:1,sugar:14,servingSize:118,servingUnit:'g'},
   {name:'Aldi Spaghetti (2oz dry)',brand:'Aldi / Reggano',cal:200,carbs:41,fiber:2,protein:7,sodium:0,sugar:1,servingSize:56,servingUnit:'g'},
   {name:'Raw Crunch Bar',brand:'Raw Crunch (Indian Trail)',cal:190,carbs:17,fiber:3,protein:6,sodium:45,sugar:8,servingSize:45,servingUnit:'g'},
   {name:'Protein Shake',brand:'Generic / Premier Protein',cal:160,carbs:5,fiber:1,protein:30,sodium:390,sugar:1,servingSize:325,servingUnit:'ml'},
+  {name:'Metamucil Capsules (5 caps)',brand:'Metamucil',cal:5,carbs:2,fiber:2,protein:0,sodium:0,sugar:0,servingSize:5,servingUnit:'caps'},
 ];
 
 // ── Recent & Favs ─────────────────────────────────────────────────
@@ -824,111 +829,43 @@ function showConf(f,scanned){
   mb.appendChild(mkBtn('sec','← Back',showMS));
 }
 
+
 function editFood(meal, idx){
-  var f = log[meal][idx];
-  if(!f) return;
-  var mb = cm2();
-  aTitle(mb, 'Edit Food', 'Adjust any values directly');
-  // Food name display
-  var nd = document.createElement('div');
-  nd.className = 'cc';
-  nd.style.marginBottom = '16px';
-  nd.innerHTML = '<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr2">'+f.brand+'</div>':'');
+  var f=log[meal][idx];if(!f)return;
+  var mb=cm2();
+  aTitle(mb,'Edit Food','Adjust servings or individual macros');
+  var nd=document.createElement('div');nd.className='cc';nd.style.marginBottom='16px';
+  nd.innerHTML='<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr2">'+f.brand+'</div>':'');
   mb.appendChild(nd);
-  // Serving shortcut row
-  var srlbl = document.createElement('div');
-  srlbl.style.cssText = 'font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;';
-  srlbl.textContent = 'Quick adjust by servings';
-  mb.appendChild(srlbl);
-  var sr = document.createElement('div');
-  sr.className = 'sv2';
-  sr.style.marginBottom = '16px';
-  var sl = document.createElement('label');
-  sl.textContent = 'Servings:';
-  var si = document.createElement('input');
-  si.type = 'number';
-  si.id = 'edit-srv';
-  si.value = f._servings || 1;
-  si.min = '0.25';
-  si.max = '20';
-  si.step = '0.25';
-  si.className = 'si2';
-  var origServings = f._servings || 1;
-  var base = {
-    cal: Math.round(f.cal/origServings),
-    carbs: Math.round(f.carbs/origServings),
-    fiber: Math.round(f.fiber/origServings),
-    protein: Math.round(f.protein/origServings),
-    sodium: Math.round(f.sodium/origServings),
-    sugar: Math.round((f.sugar||0)/origServings)
-  };
-  var su = document.createElement('span');
-  su.className = 'su2';
-  su.textContent = 'x '+base.cal+' cal';
-  sr.appendChild(sl);sr.appendChild(si);sr.appendChild(su);
-  mb.appendChild(sr);
-  // Apply servings button
-  mb.appendChild(mkBtn('sec', 'Apply Servings to Fields ↓', function(){
-    var s = parseFloat(document.getElementById('edit-srv').value)||1;
-    document.getElementById('e-cal').value = Math.round(base.cal*s);
-    document.getElementById('e-carbs').value = Math.round(base.carbs*s);
-    document.getElementById('e-fiber').value = Math.round(base.fiber*s);
-    document.getElementById('e-protein').value = Math.round(base.protein*s);
-    document.getElementById('e-sodium').value = Math.round(base.sodium*s);
-    document.getElementById('e-sugar').value = Math.round(base.sugar*s);
+  var origServings=f._servings||1;
+  var base={cal:Math.round(f.cal/origServings),carbs:Math.round(f.carbs/origServings),fiber:Math.round(f.fiber/origServings),protein:Math.round(f.protein/origServings),sodium:Math.round(f.sodium/origServings),sugar:Math.round((f.sugar||0)/origServings)};
+  var srlbl=document.createElement('div');srlbl.style.cssText='font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;';srlbl.textContent='Quick adjust by servings';mb.appendChild(srlbl);
+  var sr=document.createElement('div');sr.className='sv2';sr.style.marginBottom='10px';
+  var sl=document.createElement('label');sl.textContent='Servings:';
+  var si=document.createElement('input');si.type='number';si.id='edit-srv';si.value=origServings;si.min='0.25';si.max='20';si.step='0.25';si.className='si2';
+  var su=document.createElement('span');su.className='su2';su.textContent='x '+base.cal+' cal';
+  sr.appendChild(sl);sr.appendChild(si);sr.appendChild(su);mb.appendChild(sr);
+  mb.appendChild(mkBtn('sec','Apply Servings to Fields ↓',function(){
+    var s=parseFloat(document.getElementById('edit-srv').value)||1;
+    document.getElementById('e-cal').value=Math.round(base.cal*s);
+    document.getElementById('e-carbs').value=Math.round(base.carbs*s);
+    document.getElementById('e-fiber').value=Math.round(base.fiber*s);
+    document.getElementById('e-protein').value=Math.round(base.protein*s);
+    document.getElementById('e-sodium').value=Math.round(base.sodium*s);
+    document.getElementById('e-sugar').value=Math.round(base.sugar*s);
   }));
-  // Divider
-  var div2 = document.createElement('div');
-  div2.style.cssText = 'border-top:1px solid var(--bd);margin:14px 0 12px;';
-  mb.appendChild(div2);
-  var mlbl = document.createElement('div');
-  mlbl.style.cssText = 'font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;';
-  mlbl.textContent = 'Or edit individual macros';
-  mb.appendChild(mlbl);
-  // Macro fields grid
-  var fields = [
-    {id:'e-cal',   lbl:'Calories',   val:f.cal},
-    {id:'e-carbs', lbl:'Carbs (g)',   val:f.carbs},
-    {id:'e-fiber', lbl:'Fiber (g)',   val:f.fiber},
-    {id:'e-protein',lbl:'Protein (g)',val:f.protein},
-    {id:'e-sodium',lbl:'Sodium (mg)', val:f.sodium},
-    {id:'e-sugar', lbl:'Sugar (g)',   val:f.sugar||0}
-  ];
-  var grid = document.createElement('div');
-  grid.className = 'mgrid2';
-  fields.forEach(function(field){
-    var wrap = document.createElement('div');
-    wrap.className = 'nutr-inp fw';
-    var lbl = document.createElement('label');
-    lbl.textContent = field.lbl;
-    var inp = document.createElement('input');
-    inp.type = 'number';
-    inp.id = field.id;
-    inp.value = field.val;
-    inp.min = '0';
-    inp.className = 'nutr-inp';
-    wrap.appendChild(lbl);
-    wrap.appendChild(inp);
-    grid.appendChild(wrap);
-  });
+  var div2=document.createElement('div');div2.style.cssText='border-top:1px solid var(--bd);margin:14px 0 12px;';mb.appendChild(div2);
+  var mlbl=document.createElement('div');mlbl.style.cssText='font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;';mlbl.textContent='Or edit individual macros';mb.appendChild(mlbl);
+  var fields=[{id:'e-cal',lbl:'Calories',val:f.cal},{id:'e-carbs',lbl:'Carbs (g)',val:f.carbs},{id:'e-fiber',lbl:'Fiber (g)',val:f.fiber},{id:'e-protein',lbl:'Protein (g)',val:f.protein},{id:'e-sodium',lbl:'Sodium (mg)',val:f.sodium},{id:'e-sugar',lbl:'Sugar (g)',val:f.sugar||0}];
+  var grid=document.createElement('div');grid.className='mgrid2';
+  fields.forEach(function(field){var wrap=document.createElement('div');wrap.className='nutr-inp fw';var lbl=document.createElement('label');lbl.textContent=field.lbl;var inp=document.createElement('input');inp.type='number';inp.id=field.id;inp.value=field.val;inp.min='0';inp.className='nutr-inp';wrap.appendChild(lbl);wrap.appendChild(inp);grid.appendChild(wrap);});
   mb.appendChild(grid);
-  mb.appendChild(mkBtn('pri', '\u2713 Save Changes', function(){
-    var s = parseFloat(document.getElementById('edit-srv').value)||1;
-    log[meal][idx] = {
-      name: f.name,
-      brand: f.brand||'',
-      cal: parseInt(document.getElementById('e-cal').value)||0,
-      carbs: parseInt(document.getElementById('e-carbs').value)||0,
-      fiber: parseInt(document.getElementById('e-fiber').value)||0,
-      protein: parseInt(document.getElementById('e-protein').value)||0,
-      sodium: parseInt(document.getElementById('e-sodium').value)||0,
-      sugar: parseInt(document.getElementById('e-sugar').value)||0,
-      scanned: f.scanned||false,
-      _servings: s
-    };
-    saveDay(); renderAll(); closeModal();
+  mb.appendChild(mkBtn('pri','✓ Save Changes',function(){
+    var s=parseFloat(document.getElementById('edit-srv').value)||1;
+    log[meal][idx]={name:f.name,brand:f.brand||'',cal:parseInt(document.getElementById('e-cal').value)||0,carbs:parseInt(document.getElementById('e-carbs').value)||0,fiber:parseInt(document.getElementById('e-fiber').value)||0,protein:parseInt(document.getElementById('e-protein').value)||0,sodium:parseInt(document.getElementById('e-sodium').value)||0,sugar:parseInt(document.getElementById('e-sugar').value)||0,scanned:f.scanned||false,_servings:s};
+    saveDay();renderAll();closeModal();
   }));
-  mb.appendChild(mkBtn('sec', 'Cancel', closeModal));
+  mb.appendChild(mkBtn('sec','Cancel',closeModal));
   document.getElementById('ov').classList.add('open');
 }
 
@@ -943,6 +880,96 @@ function showLoad(msg){var mb=cm2();var t=document.createElement('div');t.style.
 // ── Suggest ───────────────────────────────────────────────────────
 function setSit(s,el){sit=s;document.querySelectorAll('.si').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderSuggest();}
 function renderSuggest(){renderDS();var t=getTot(),nf=t.fiber<18,np=t.protein<100,hc=t.carbs>110,hs=t.sodium>1800,hr=new Date().getHours(),tEl=document.getElementById('sgtitle'),lEl=document.getElementById('sglist');lEl.innerHTML='';var cards,isR=false;if(sit==='home'){tEl.textContent=hr<11?'Breakfast Ideas':hr<15?'Lunch Ideas':'Dinner Ideas';cards=hIdeas(nf,np,hc);}else if(sit==='quick'){tEl.textContent='Quick Options';cards=qIdeas(nf,np,hc);}else if(sit==='out'){tEl.textContent='Eating Out Tonight';cards=rIdeas(nf,np,hc,hs);isR=true;}else{tEl.textContent='Smart Snacks';cards=sIdeas(nf,np,hc);}cards.forEach(function(c){lEl.appendChild(isR?mkRC(c):mkSC(c));});}
+
+function renderLiveAdvice(){
+  // All advice grounded in ACC/AHA lipid guidelines, ADA prediabetes standards,
+  // USDA Dietary Guidelines, and AHA sodium recommendations.
+  var el=document.getElementById('live-advice');if(!el)return;
+  var t=getTot(),hr=new Date().getHours(),messages=[];
+  var calLeft=2000-t.cal,carbsLeft=130-t.carbs,fiberLeft=28-t.fiber,protLeft=150-t.protein;
+
+  if(t.cal===0){
+    messages.push({icon:'☀️',text:'Nothing logged yet. Regular meals help stabilize blood sugar — important for managing your A1C of 5.7 (ADA prediabetes guidelines).',type:'info'});
+  } else {
+
+    // ── Calories (USDA Dietary Guidelines) ────────────────────────
+    if(calLeft<0){
+      messages.push({icon:'⚠️',text:'Calories are '+Math.abs(Math.round(calLeft))+' over your 2,000 goal. Consistent surpluses contribute to weight gain, which worsens insulin resistance and triglycerides (AHA/ACC).',type:'bad'});
+    } else if(calLeft>1200&&hr>16){
+      messages.push({icon:'ℹ️',text:'You have '+Math.round(calLeft)+' calories remaining. Skipping meals can increase hunger hormones, leading to overeating and blood sugar spikes — a consistent pattern linked to worsening A1C (ADA).',type:'info'});
+    } else if(calLeft<300&&hr<15){
+      messages.push({icon:'⚠️',text:'Only '+Math.round(calLeft)+' calories left before mid-afternoon. Plan a light, protein-focused dinner to avoid going over.',type:'warn'});
+    } else if(calLeft>=300&&calLeft<=600&&hr>17){
+      messages.push({icon:'✅',text:'You have a healthy '+Math.round(calLeft)+' calories left for dinner. Aim for lean protein and vegetables to close out the day well.',type:'good'});
+    }
+
+    // ── Carbohydrates (ADA + ACC/AHA for triglycerides) ───────────
+    if(t.carbs>130){
+      messages.push({icon:'🍞',text:'Carbs are '+Math.round(t.carbs-130)+'g over your 130g limit. Excess refined carbohydrates directly raise triglycerides and worsen insulin resistance — your two primary metabolic concerns (ACC/AHA, ADA).',type:'bad'});
+    } else if(t.carbs>110){
+      messages.push({icon:'🍞',text:'Only '+Math.round(carbsLeft)+'g of carbs remaining. Your 130g limit is set to help lower triglycerides (currently borderline at 199) per ACC/AHA guidelines. Avoid bread, rice, or starchy sides at dinner.',type:'warn'});
+    } else if(t.carbs<=80&&hr>17){
+      messages.push({icon:'🍞',text:'Carbs are well-managed at '+Math.round(t.carbs)+'g. Keeping carbs moderate is one of the most evidence-backed strategies for reducing triglycerides (ACC/AHA).',type:'good'});
+    }
+
+    // ── Fiber (AHA + ADA) ─────────────────────────────────────────
+    if(t.fiber>=28){
+      messages.push({icon:'🌿',text:'Fiber goal met at '+Math.round(t.fiber)+'g. Soluble fiber specifically lowers LDL cholesterol and improves blood sugar control — directly addressing your lipid panel (AHA, ADA).',type:'good'});
+    } else if(t.fiber>=20){
+      messages.push({icon:'🌿',text:'Almost at your fiber goal — '+Math.round(fiberLeft)+'g to go. The ADA recommends 25-30g daily for prediabetes management. Add black beans, a salad, or a piece of fruit.',type:'info'});
+    } else if(hr>17&&t.fiber<14){
+      messages.push({icon:'🌿',text:'Fiber is low at '+Math.round(t.fiber)+'g with the day winding down. Low fiber intake is linked to higher post-meal blood sugar spikes (ADA). Add black beans or green vegetables to dinner.',type:'warn'});
+    } else if(hr<=12&&t.fiber<5){
+      messages.push({icon:'🌿',text:'Start building fiber early. The ADA links adequate daily fiber to better A1C control over time. Cheerios, a banana, or yogurt with fruit all help.',type:'info'});
+    }
+
+    // ── Protein (general nutrition + ADA blood sugar stability) ───
+    if(t.protein>=150){
+      messages.push({icon:'💪',text:'Protein goal reached at '+Math.round(t.protein)+'g. Adequate protein slows digestion and blunts post-meal blood sugar rises — an important strategy for your A1C (ADA).',type:'good'});
+    } else if(t.protein>=100){
+      messages.push({icon:'💪',text:'Protein is solid at '+Math.round(t.protein)+'g. One more protein-focused meal will close out the goal and help keep blood sugar stable overnight.',type:'info'});
+    } else if(hr>17&&t.protein<70){
+      messages.push({icon:'💪',text:'Protein is only '+Math.round(t.protein)+'g at dinner time. Prioritize salmon, chicken, or eggs — high protein meals improve satiety and reduce the urge to snack on high-carb foods later (ADA).',type:'warn'});
+    } else if(t.protein<50&&hr>11){
+      messages.push({icon:'💪',text:'Protein is low at '+Math.round(t.protein)+'g. Including protein at every meal is recommended by the ADA to help stabilize blood sugar and support your A1C goal.',type:'warn'});
+    }
+
+    // ── Sodium (AHA: <2,300mg, ideally <1,500mg with CVD risk) ────
+    if(t.sodium>2300){
+      messages.push({icon:'🧂',text:'Sodium is '+Math.round(t.sodium-2300)+'mg over the AHA limit of 2,300mg. Given your cardiovascular risk profile (low HDL, high triglycerides), the AHA ideally recommends under 1,500mg. Avoid all sauces, processed foods, and restaurant meals for the rest of today.',type:'bad'});
+    } else if(t.sodium>1800){
+      messages.push({icon:'🧂',text:'Sodium is at '+Math.round(t.sodium)+'mg. The AHA limit is 2,300mg but recommends closer to 1,500mg for people with cardiovascular risk factors like yours. Keep dinner simple — no sauces or restaurant food.',type:'warn'});
+    } else if(t.sodium<=1000&&hr>17){
+      messages.push({icon:'🧂',text:'Sodium is well-controlled at '+Math.round(t.sodium)+'mg. This is excellent for your cardiovascular profile (AHA).',type:'good'});
+    }
+
+    // ── Triglyceride-specific sugar check ─────────────────────────
+    var totalSugar=(t.sugar||0);
+    if(totalSugar>40){
+      messages.push({icon:'🍬',text:'Sugar intake is high today at '+Math.round(totalSugar)+'g. Added sugar is one of the strongest dietary drivers of elevated triglycerides. Your triglycerides are currently borderline high at 199 (ACC/AHA threshold: 150mg/dL).',type:'bad'});
+    } else if(totalSugar>25){
+      messages.push({icon:'🍬',text:'Sugar is at '+Math.round(totalSugar)+'g today. The AHA recommends under 25g added sugar for women, 36g for men. High sugar intake directly raises triglycerides.',type:'warn'});
+    }
+
+    if(messages.length===0){
+      messages.push({icon:'✅',text:'All your numbers are on track. Consistent days like this directly support your goals of lowering triglycerides and improving your A1C per ACC/AHA and ADA guidelines.',type:'good'});
+    }
+  }
+
+  // Disclaimer
+  messages.push({icon:'🩺',text:'This advice is based on ACC/AHA and ADA clinical guidelines and your known health profile. Always follow your doctor’s specific recommendations.',type:'info'});
+
+  el.innerHTML='';
+  messages.forEach(function(m){
+    var div=document.createElement('div');
+    var bg=m.type==='good'?'var(--ap)':m.type==='bad'?'var(--wp)':m.type==='warn'?'var(--gp)':'var(--sf2)';
+    var co=m.type==='good'?'var(--ac)':m.type==='bad'?'var(--wn)':m.type==='warn'?'var(--gd)':'var(--t2)';
+    div.style.cssText='background:'+bg+';border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;gap:8px;align-items:flex-start;';
+    div.innerHTML='<span style="font-size:16px;flex-shrink:0;">'+m.icon+'</span><span style="font-size:13px;color:'+co+';font-weight:600;line-height:1.4;">'+m.text+'</span>';
+    el.appendChild(div);
+  });
+}
+
 function renderDS(){var t=getTot(),el=document.getElementById('ds');if(t.cal===0){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">Nothing logged yet today.</div>';return;}var gaps=[{i:'🔥',l:'Calories',v:Math.round(t.cal),g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:Math.round(t.carbs),g:130,u:'g',mn:false},{i:'🌿',l:'Fiber',v:Math.round(t.fiber),g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:Math.round(t.protein),g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:Math.round(t.sodium),g:2300,u:'mg',mn:false}];el.innerHTML=gaps.map(function(g){var p=(g.v/g.g)*100,badge,status;if(g.mn){if(p>=100){badge='good';status='Met';}else if(p>=60){badge='warn';status=Math.round(g.g-g.v)+g.u+' to go';}else{badge='bad';status=Math.round(g.g-g.v)+g.u+' needed';}}else{if(p<=75){badge='good';status=Math.round(g.g-g.v)+g.u+' left';}else if(p<=100){badge='warn';status=Math.round(g.g-g.v)+g.u+' left';}else{badge='bad';status='Over goal';}}return'<div class="dg"><div class="dgi">'+g.i+'</div><div class="dgt"><div class="dgl">'+g.l+'</div><div class="dgs">'+g.v+g.u+' of '+g.g+g.u+'</div></div><div class="dgb '+badge+'">'+status+'</div></div>';}).join('');}
 function mkSC(s){var d=document.createElement('div');d.className='sgc';var top=document.createElement('div');top.className='sgt';var em=document.createElement('div');em.className='sge';em.textContent=s.e;var info=document.createElement('div');info.className='sgi';info.innerHTML='<div class="sgn">'+s.n+'</div><div class="sgw">'+s.w+'</div><div class="sgd">'+s.d+'</div>';top.appendChild(em);top.appendChild(info);d.appendChild(top);var ch=document.createElement('div');ch.className='sgch';ch.innerHTML=s.c.map(function(c){return'<span class="sc '+(c.t||'')+'">'+c.l+'</span>';}).join('');d.appendChild(ch);return d;}
 function mkRC(r){var d=document.createElement('div');d.className='rc';d.innerHTML='<div class="rcn">'+r.e+' '+r.n+'</div><div class="rct">'+r.t+'</div>';r.o.forEach(function(o){var row=document.createElement('div');row.className='rco';row.innerHTML='<div>✓</div><div class="rcot"><strong>'+o.i+'</strong><div class="rcop">'+o.t+'</div></div>';d.appendChild(row);});return d;}
