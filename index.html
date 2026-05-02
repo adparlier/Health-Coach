@@ -455,7 +455,7 @@ function showMS(){
   aTitle(mb,'Log Food','Choose how to add your meal');
   aMTabs(mb);
   var gr=document.createElement('div');gr.className='mgr';
-  [{i:'🔍',l:'Search',fn:showSearch},{i:'⏰',l:'Recent & Favs',fn:function(){showFH('recent');}},{i:'📷',l:'Scan Barcode',fn:showBC},{i:'✏️',l:'Enter Manually',fn:showManual}].forEach(function(item){
+  [{i:'🔍',l:'Search',fn:showSearch},{i:'⏰',l:'Recent & Favs',fn:function(){showFH('aldi');}},{i:'📷',l:'Scan Barcode',fn:showBC},{i:'✏️',l:'Enter Manually',fn:showManual}].forEach(function(item){
     var btn=document.createElement('div');btn.className='mbt';
     btn.innerHTML='<div class="mi">'+item.i+'</div><div class="mlb">'+item.l+'</div>';
     btn.onclick=item.fn;gr.appendChild(btn);
@@ -485,35 +485,54 @@ function doSearch(){
   var q=inp?inp.value.trim():'';
   if(!q)return;
   showLoad('Searching for '+q+'...');
-  // Use OFF v2 search API - same CORS policy as barcode lookup which works
-  var url='https://world.openfoodfacts.org/api/v2/search?search_terms='+encodeURIComponent(q)+'&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity,product_quantity&sort_by=unique_scans_n';
+  // Try v2 first, fallback to cgi
+  var url='https://world.openfoodfacts.org/api/v2/search?search_terms='+encodeURIComponent(q)+'&page_size=20&fields=product_name,brands,nutriments,serving_size,serving_quantity,countries_tags,unique_scans_n&sort_by=unique_scans_n';
   fetch(url)
-    .then(function(r){
-      if(!r.ok)throw new Error('http '+r.status);
-      return r.json();
-    })
-    .then(function(data){
-      var ps=(data.products||[]).filter(function(p){
-        var n=p.nutriments||{};
-        var nm=(p.product_name||'').trim();
-        return nm.length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);
-      }).slice(0,6);
-      if(!ps.length){showNF(q);return;}
-      window._res=ps.map(parseOFF);
-      showRes(window._res);
-    })
-    .catch(function(err){
-      // Try fallback endpoint
-      var url2='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity';
-      fetch(url2)
+    .then(function(r){if(!r.ok)throw new Error('http '+r.status);return r.json();})
+    .then(function(data){processSearchResults(data.products||[],q);})
+    .catch(function(){
+      fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=20&fields=product_name,brands,nutriments,serving_size,serving_quantity,countries_tags,unique_scans_n')
         .then(function(r){return r.json();})
-        .then(function(data){
-          var ps=(data.products||[]).filter(function(p){var n=p.nutriments||{};return(p.product_name||'').trim().length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']);}).slice(0,6);
-          if(!ps.length){showNF(q);return;}
-          window._res=ps.map(parseOFF);showRes(window._res);
-        })
+        .then(function(data){processSearchResults(data.products||[],q);})
         .catch(function(){showNF(q);});
     });
+}
+
+function processSearchResults(products, q){
+  // Filter: must have name and calories
+  var valid = products.filter(function(p){
+    var n=p.nutriments||{};
+    var nm=(p.product_name||'').trim();
+    return nm.length>0 && (n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);
+  });
+
+  // Score: prefer English/US products, penalize foreign language names
+  var qLower = q.toLowerCase();
+  valid = valid.map(function(p){
+    var score = p.unique_scans_n || 0;
+    var nm = (p.product_name||'').toLowerCase();
+    var countries = (p.countries_tags||[]).join(',').toLowerCase();
+    // Boost US/English products
+    if(countries.indexOf('en:united-states')>-1) score += 10000;
+    if(countries.indexOf('en:canada')>-1) score += 5000;
+    if(countries.indexOf('en:united-kingdom')>-1) score += 3000;
+    // Boost if name contains query words
+    qLower.split(' ').forEach(function(word){
+      if(word.length>2 && nm.indexOf(word)>-1) score += 2000;
+    });
+    // Penalize if name has non-ASCII chars (likely foreign)
+    if(/[^ -]/.test(p.product_name||'')) score -= 3000;
+    p._score = score;
+    return p;
+  });
+
+  // Sort by score descending
+  valid.sort(function(a,b){return b._score - a._score;});
+
+  var top = valid.slice(0,6);
+  if(!top.length){showNF(q);return;}
+  window._res = top.map(parseOFF);
+  showRes(window._res);
 }
 
 function showNF(q){
@@ -553,15 +572,42 @@ function showRes(foods){
   mb.appendChild(mkBtn('sec','← Search Again',showSearch));
 }
 
+
+// ── Aldi Staples ─────────────────────────────────────────────────
+var ALDI_STAPLES = [
+  {name:'Salmon Fillet (6oz)',brand:'Aldi / Seasons Choice',cal:280,carbs:0,fiber:0,protein:34,sodium:115,sugar:0,servingSize:170,servingUnit:'g'},
+  {name:'Friendly Farms Plain Greek Yogurt',brand:'Aldi / Friendly Farms',cal:100,carbs:7,fiber:0,protein:17,sodium:65,sugar:6,servingSize:170,servingUnit:'g'},
+  {name:'Friendly Farms Vanilla Greek Yogurt',brand:'Aldi / Friendly Farms',cal:140,carbs:20,fiber:0,protein:11,sodium:75,sugar:19,servingSize:170,servingUnit:'g'},
+  {name:'Southern Grove Almonds (Roasted Salted)',brand:'Aldi / Southern Grove',cal:170,carbs:6,fiber:3,protein:6,sodium:95,sugar:1,servingSize:28,servingUnit:'g'},
+  {name:'Rotisserie Chicken (whole)',brand:'Aldi',cal:180,carbs:0,fiber:0,protein:26,sodium:440,sugar:0,servingSize:113,servingUnit:'g'},
+  {name:'Eggs Large (2 eggs)',brand:'Aldi / Goldhen',cal:140,carbs:0,fiber:0,protein:12,sodium:125,sugar:0,servingSize:100,servingUnit:'g'},
+  {name:'Peanut Butter (2 tbsp)',brand:'Aldi / Peanut Delight',cal:190,carbs:7,fiber:2,protein:8,sodium:150,sugar:3,servingSize:32,servingUnit:'g'},
+  {name:'Whole Grain Bread (1 slice)',brand:'Aldi / LOven Fresh',cal:90,carbs:17,fiber:2,protein:4,sodium:140,sugar:2,servingSize:38,servingUnit:'g'},
+  {name:'Cheerios',brand:'General Mills',cal:140,carbs:29,fiber:4,protein:5,sodium:190,sugar:2,servingSize:39,servingUnit:'g'},
+  {name:'Ground Beef 93% Lean (4oz)',brand:'Aldi / Never Any',cal:150,carbs:0,fiber:0,protein:25,sodium:75,sugar:0,servingSize:113,servingUnit:'g'},
+  {name:'Chicken Breast (6oz)',brand:'Aldi / Never Any',cal:185,carbs:0,fiber:0,protein:40,sodium:85,sugar:0,servingSize:170,servingUnit:'g'},
+  {name:'Sweet Potato (medium)',brand:'Fresh',cal:103,carbs:24,fiber:4,protein:2,sodium:41,sugar:7,servingSize:130,servingUnit:'g'},
+  {name:'Green Beans (1 cup)',brand:'Fresh / Canned',cal:31,carbs:7,fiber:3,protein:2,sodium:6,sugar:3,servingSize:100,servingUnit:'g'},
+  {name:'Brown Rice (1 cup cooked)',brand:'Generic',cal:216,carbs:45,fiber:4,protein:5,sodium:10,sugar:0,servingSize:202,servingUnit:'g'},
+  {name:'Black Beans (1/2 cup)',brand:'Canned',cal:110,carbs:20,fiber:7,protein:7,sodium:240,sugar:0,servingSize:130,servingUnit:'g'},
+  {name:'Olive Oil (1 tbsp)',brand:'Aldi / Carlini',cal:120,carbs:0,fiber:0,protein:0,sodium:0,sugar:0,servingSize:14,servingUnit:'g'},
+  {name:'Banana (medium)',brand:'Fresh',cal:105,carbs:27,fiber:3,protein:1,sodium:1,sugar:14,servingSize:118,servingUnit:'g'},
+  {name:'Aldi Spaghetti (2oz dry)',brand:'Aldi / Reggano',cal:200,carbs:41,fiber:2,protein:7,sodium:0,sugar:1,servingSize:56,servingUnit:'g'},
+  {name:'Raw Crunch Bar',brand:'Raw Crunch (Indian Trail)',cal:190,carbs:17,fiber:3,protein:6,sodium:45,sugar:8,servingSize:45,servingUnit:'g'},
+  {name:'Protein Shake',brand:'Generic / Premier Protein',cal:160,carbs:5,fiber:1,protein:30,sodium:390,sugar:1,servingSize:325,servingUnit:'ml'},
+];
+
 // ── Recent & Favs ─────────────────────────────────────────────────
 function showFH(tab){
   var hist=getHist(),favs=getFavs();
-  var items=tab==='favs'?Object.values(favs):Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);});
-  var mb=cm2();aTitle(mb,tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);
+  var isAldi=tab==='aldi';
+  var items=isAldi?ALDI_STAPLES:(tab==='favs'?Object.values(favs):Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);}));
+  var mb=cm2();aTitle(mb,isAldi?'My Aldi Staples':tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);
   var tabs=document.createElement('div');tabs.className='stb';
   var r=document.createElement('button');r.className='sta'+(tab==='recent'?' active':'');r.textContent='⏰ Recent';r.onclick=function(){showFH('recent');};
   var f2=document.createElement('button');f2.className='sta'+(tab==='favs'?' active':'');f2.textContent='⭐ Favorites';f2.onclick=function(){showFH('favs');};
-  tabs.appendChild(r);tabs.appendChild(f2);mb.appendChild(tabs);
+  var a=document.createElement('button');a.className='sta'+(tab==='aldi'?' active':'');a.textContent='🛒 My Aldi';a.onclick=function(){showFH('aldi');};
+  tabs.appendChild(r);tabs.appendChild(f2);tabs.appendChild(a);mb.appendChild(tabs);
   if(!items.length){var em=document.createElement('div');em.className='ehi';em.textContent=tab==='favs'?'No favorites yet':'No history yet';mb.appendChild(em);}
   else{items.forEach(function(f){
     var k=f.name.toLowerCase().trim(),row=document.createElement('div');row.className='hi';
