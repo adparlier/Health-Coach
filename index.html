@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>NourishLog</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 <style>
 :root{--bg:#cce0f0;--sf:#fff;--sf2:#dceefa;--bd:#8ab8d8;--ac:#0a1f3d;--al:#0d6eab;--ap:#b0d8f0;--wn:#c0392b;--wp:#fde8e6;--gd:#c89000;--gp:#fef3cd;--tx:#000;--t2:#0a1f3d;--t3:#1a5080;--sh:0 2px 12px rgba(10,31,61,0.15);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -14,7 +15,7 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .at{font-family:'Fraunces',serif;font-size:24px;color:#fff;}
 .at span{color:#4B9CD3;font-style:italic;}
 .ah{font-size:9px;color:rgba(75,156,211,0.9);letter-spacing:2px;text-transform:uppercase;margin-top:1px;font-weight:700;}
-.dp{background:rgba(75,156,211,0.25);border:1px solid rgba(75,156,211,0.5);border-radius:20px;padding:4px 10px;font-size:11px;color:#fff;font-weight:700;}
+.dp{background:rgba(75,156,211,0.25);border:1px solid rgba(75,156,211,0.5);border-radius:20px;padding:4px 10px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;}
 .nav{display:flex;}
 .nt{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;font-family:'Nunito',sans-serif;background:none;border-top:none;border-left:none;border-right:none;}
 .nt.active{color:#fff;border-bottom-color:#4B9CD3;}
@@ -29,7 +30,7 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .sbf{height:100%;background:#4B9CD3;transition:width 0.5s ease;}
 .sbf.w{background:var(--gd);}.sbf.o{background:var(--wn);}
 .sec{background:var(--sf);margin:10px 14px;border-radius:14px;padding:14px;box-shadow:var(--sh);border:1px solid var(--bd);}
-.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.sh2{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .st{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ac);font-weight:700;}
 .cb{font-size:11px;color:var(--t3);background:none;border:1px solid var(--bd);border-radius:10px;padding:3px 9px;cursor:pointer;font-family:'Nunito',sans-serif;}
 .gr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
@@ -46,14 +47,14 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .pc.pend{background:var(--sf2);color:var(--t3);}
 .pc.prog{background:var(--gp);color:var(--gd);}
 .mg{margin-bottom:4px;}
-.ml{display:flex;justify-content:space-between;align-items:center;padding:5px 0 7px;}
+.ml2{display:flex;justify-content:space-between;align-items:center;padding:5px 0 7px;}
 .mn{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);}
-.mc{font-size:12px;color:var(--al);font-weight:700;}
+.mcc{font-size:12px;color:var(--al);font-weight:700;}
 .fc{background:var(--sf2);border-radius:10px;padding:10px 12px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:flex-start;animation:pi 0.2s ease;border:1px solid var(--bd);}
 @keyframes pi{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
 .fl{flex:1;min-width:0;}
 .fn{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fb{font-size:10px;color:var(--t3);margin-bottom:5px;}
+.fbr{font-size:10px;color:var(--t3);margin-bottom:5px;}
 .fch{display:flex;gap:4px;flex-wrap:wrap;}
 .ch{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--sf);color:var(--t2);font-weight:600;border:1px solid var(--bd);}
 .ch.fi{background:var(--ap);color:var(--ac);border-color:transparent;}
@@ -64,6 +65,8 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .db{background:none;border:none;color:var(--t3);cursor:pointer;font-size:17px;line-height:1;padding:0;}
 .db:hover{color:var(--wn);}
 .en{font-size:12px;color:var(--t3);font-style:italic;padding:3px 0 8px;}
+.sync-bar{background:rgba(75,156,211,0.15);border:1px solid rgba(75,156,211,0.3);border-radius:8px;padding:6px 12px;margin:8px 14px 0;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--t3);}
+.sync-btn{background:var(--al);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
 .fab{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d6eab;color:#fff;border:none;border-radius:28px;padding:14px 32px;font-size:15px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 4px 20px rgba(13,110,171,0.5);transition:all 0.2s;z-index:200;white-space:nowrap;}
 .fab:hover{background:#0a5a8f;transform:translateX(-50%) translateY(-2px);}
 .fab.hid{display:none;}
@@ -75,14 +78,14 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .mts{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
 .mt{padding:7px 14px;border-radius:18px;border:2px solid var(--bd);background:var(--sf2);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s;}
 .mt.active{background:var(--ac);border-color:var(--ac);color:#fff;}
-.mgr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
-.mbt{background:var(--sf2);border:2px solid var(--bd);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.mgr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.mbt{background:var(--sf2);border:2px solid var(--bd);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
 .mbt:hover{border-color:var(--al);background:var(--ap);}
 .mi{font-size:24px;margin-bottom:5px;}
 .mlb{font-size:11px;font-weight:700;color:var(--t2);}
 .fl2{font-size:12px;color:var(--t2);font-weight:700;margin-bottom:5px;display:block;}
-input[type=text]{width:100%;background:var(--sf2);border:2px solid var(--bd);border-radius:10px;padding:11px 13px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
-input[type=text]:focus{border-color:var(--al);}
+input[type=text],input[type=number],textarea{width:100%;background:var(--sf2);border:2px solid var(--bd);border-radius:10px;padding:11px 13px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;resize:none;}
+input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(--al);}
 .fw{margin-bottom:12px;}
 .ab{width:100%;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all 0.2s;margin-bottom:7px;}
 .ab.pri{background:var(--ac);color:#fff;}.ab.pri:hover{background:#061428;}
@@ -92,13 +95,13 @@ input[type=text]:focus{border-color:var(--al);}
 .sta.active{background:var(--al);border-color:var(--al);color:#fff;}
 .hi{background:var(--sf2);border:2px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:all 0.15s;display:flex;justify-content:space-between;align-items:center;}
 .hi:hover{border-color:var(--al);background:var(--ap);}
-.hl{flex:1;min-width:0;}
+.hl2{flex:1;min-width:0;}
 .hn{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hb{font-size:10px;color:var(--t3);margin-bottom:3px;}
 .hm{display:flex;gap:7px;flex-wrap:wrap;}
 .hm span{font-size:11px;color:var(--t2);font-weight:600;}
 .hri{display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-left:8px;flex-shrink:0;}
-.hc{font-size:15px;font-weight:700;color:var(--al);}
+.hcc{font-size:15px;font-weight:700;color:var(--al);}
 .fvb{background:none;border:none;font-size:17px;cursor:pointer;padding:0;line-height:1;}
 .hco{font-size:10px;color:var(--t3);font-weight:600;}
 .ehi{text-align:center;padding:20px;color:var(--t3);font-size:13px;font-style:italic;}
@@ -110,7 +113,7 @@ input[type=text]:focus{border-color:var(--al);}
 .rm span{font-size:11px;color:var(--t2);font-weight:600;}
 .cc{background:var(--ap);border:2px solid var(--al);border-radius:12px;padding:14px;margin-bottom:14px;}
 .cn{font-size:15px;font-weight:700;color:var(--ac);margin-bottom:3px;}
-.cbr{font-size:11px;color:var(--t2);margin-bottom:10px;}
+.cbr2{font-size:11px;color:var(--t2);margin-bottom:10px;}
 .cm{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px;}
 .cma{background:var(--sf);border-radius:8px;padding:7px 3px;text-align:center;}
 .cmv{font-size:13px;font-weight:700;color:var(--al);}
@@ -118,11 +121,11 @@ input[type=text]:focus{border-color:var(--al);}
 .ct{font-size:12px;color:var(--ac);line-height:1.4;padding-top:8px;border-top:1px solid rgba(13,110,171,0.25);}
 .sv2{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 .sv2 label{font-size:12px;color:var(--t2);font-weight:700;flex-shrink:0;}
-.sv2 input[type=number]{width:75px;background:var(--sf2);border:2px solid var(--bd);border-radius:9px;padding:7px 10px;font-size:14px;font-family:'Nunito',sans-serif;color:var(--tx);outline:none;}
+.sv2 .si2{width:75px;}
 .su2{font-size:12px;color:var(--t2);}
-.pd{border:2px dashed var(--al);border-radius:12px;padding:28px 14px;text-align:center;cursor:pointer;margin-bottom:12px;background:var(--sf2);}
+.pd{border:2px dashed var(--al);border-radius:12px;padding:24px 14px;text-align:center;cursor:pointer;margin-bottom:12px;background:var(--sf2);}
 .pd:hover{background:var(--ap);}
-.pdi{font-size:32px;margin-bottom:6px;}
+.pdi{font-size:28px;margin-bottom:5px;}
 .pdl{font-size:13px;font-weight:700;color:var(--ac);margin-bottom:3px;}
 .pds{font-size:11px;color:var(--t3);}
 #pi{display:none;}
@@ -132,6 +135,18 @@ input[type=text]:focus{border-color:var(--al);}
 .dot:nth-child(2){animation-delay:0.15s;}.dot:nth-child(3){animation-delay:0.3s;}
 @keyframes pu{0%,100%{transform:scale(0.6);opacity:0.4;}50%{transform:scale(1);opacity:1;}}
 .eb{background:var(--wp);border:1px solid var(--wn);border-radius:9px;padding:11px 13px;font-size:13px;color:var(--wn);margin-bottom:12px;line-height:1.4;}
+.success-box{background:var(--ap);border:1px solid var(--al);border-radius:9px;padding:11px 13px;font-size:13px;color:var(--ac);margin-bottom:12px;}
+.mgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.nutr-inp{text-align:center;}
+.nutr-inp label{display:block;font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.nutr-inp input{text-align:center;padding:8px 4px;font-size:14px;}
+/* Barcode scanner */
+#bc-scanner-wrap{position:relative;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000;min-height:200px;}
+#bc-scanner-wrap video{width:100%;display:block;}
+#bc-scanner-wrap canvas{display:none;}
+.bc-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.bc-frame{width:80%;max-width:260px;height:100px;border:3px solid #4B9CD3;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,0.4);}
+/* Suggest */
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .si{background:var(--sf2);border:2px solid var(--bd);border-radius:11px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s;}
 .si span{font-size:11px;font-weight:700;color:var(--t2);}
@@ -195,15 +210,15 @@ input[type=text]:focus{border-color:var(--al);}
 .gh:last-child{border-bottom:none;}
 .ghl{font-size:12px;color:var(--t2);font-weight:700;width:64px;flex-shrink:0;}
 .ghd{display:flex;gap:3px;flex:1;flex-wrap:wrap;}
-.gd{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
-.gd.hit{background:var(--al);}.gd.miss{background:var(--bd);}
+.gd2{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.gd2.hit{background:var(--al);}.gd2.miss{background:var(--bd);}
 .ghp{font-size:11px;font-weight:700;color:var(--al);width:34px;text-align:right;}
 .tfr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);}
 .tfr:last-child{border-bottom:none;}
 .tfrk{font-size:15px;width:22px;text-align:center;}
 .tfn{font-size:12px;color:var(--tx);font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .tfc{font-size:11px;color:var(--t3);font-weight:600;}
-.cbr2{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.cbr3{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
 .cbd{font-size:10px;color:var(--t3);width:40px;flex-shrink:0;font-weight:600;}
 .cbw{flex:1;height:16px;background:var(--sf2);border-radius:4px;overflow:hidden;}
 .cbf{height:100%;border-radius:4px;background:var(--al);}
@@ -216,7 +231,7 @@ input[type=text]:focus{border-color:var(--al);}
 <header>
   <div class="hr">
     <div><div class="at">Nourish<span>Log</span></div><div class="ah">Go Heels 🐏</div></div>
-    <div class="dp" id="dp"></div>
+    <div class="dp" id="dp" onclick="showSyncSetup()"></div>
   </div>
   <nav class="nav">
     <button class="nt active" onclick="showPage('log',this)">📋 Today</button>
@@ -225,6 +240,12 @@ input[type=text]:focus{border-color:var(--al);}
     <button class="nt" onclick="showPage('trends',this)">📊 Trends</button>
   </nav>
 </header>
+
+<div id="sync-status-bar" class="sync-bar" style="display:none;">
+  <span id="sync-status-text">Not synced</span>
+  <button class="sync-btn" onclick="syncNow()">Sync Now</button>
+</div>
+
 <div class="page active" id="page-log">
   <div class="sr">
     <div class="sb"><div class="sv" id="sv-cal">0</div><div class="sl">Cal</div><div class="ss">/2000</div><div class="sba"><div class="sbf" id="sb-cal" style="width:0%"></div></div></div>
@@ -234,19 +255,20 @@ input[type=text]:focus{border-color:var(--al);}
     <div class="sb"><div class="sv" id="sv-sodium">0mg</div><div class="sl">Sodium</div><div class="ss">/2300</div><div class="sba"><div class="sbf" id="sb-sodium" style="width:0%"></div></div></div>
   </div>
   <div class="sec">
-    <div class="sh"><span class="st">Daily Progress</span><button class="cb" onclick="clearDay()">Clear Day</button></div>
+    <div class="sh2"><span class="st">Daily Progress</span><button class="cb" onclick="clearDay()">Clear Day</button></div>
     <div class="gr"><span class="gl">Calories</span><div class="gt"><div class="gf" id="gf-cal" style="width:0%"></div></div><span class="gn" id="gn-cal">0 / 2000</span></div>
     <div class="gr"><span class="gl">Carbs</span><div class="gt"><div class="gf" id="gf-carbs" style="width:0%"></div></div><span class="gn" id="gn-carbs">0 / 130g</span></div>
     <div class="gr"><span class="gl">Fiber</span><div class="gt"><div class="gf" id="gf-fiber" style="width:0%"></div></div><span class="gn" id="gn-fiber">0 / 28g</span></div>
     <div class="gr"><span class="gl">Protein</span><div class="gt"><div class="gf" id="gf-protein" style="width:0%"></div></div><span class="gn" id="gn-protein">0 / 150g</span></div>
     <div class="gr"><span class="gl">Sodium</span><div class="gt"><div class="gf" id="gf-sodium" style="width:0%"></div></div><span class="gn" id="gn-sodium">0 / 2300mg</span></div>
   </div>
-  <div class="sec"><div class="sh"><span class="st">Status</span></div><div class="pw" id="pfw"><div class="pc pend">Log a meal to see status</div></div></div>
-  <div class="sec" style="margin-bottom:80px;"><div class="sh"><span class="st">Today's Meals</span></div><div id="mc"></div></div>
+  <div class="sec"><div class="sh2"><span class="st">Status</span></div><div class="pw" id="pfw"><div class="pc pend">Log a meal to see status</div></div></div>
+  <div class="sec" style="margin-bottom:80px;"><div class="sh2"><span class="st">Today's Meals</span></div><div id="mc"></div></div>
 </div>
+
 <div class="page" id="page-suggest">
   <div style="padding:12px 14px 0;">
-    <div class="sec" style="margin:0 0 10px;"><div class="sh"><span class="st">What's your situation?</span></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">What's your situation?</span></div>
       <div class="sg">
         <button class="si active" onclick="setSit('home',this)"><div class="sii">🏠</div><span>Cooking at Home</span></button>
         <button class="si" onclick="setSit('quick',this)"><div class="sii">⚡</div><span>Need it Fast</span></button>
@@ -254,51 +276,132 @@ input[type=text]:focus{border-color:var(--al);}
         <button class="si" onclick="setSit('snack',this)"><div class="sii">🍎</div><span>Just a Snack</span></button>
       </div>
     </div>
-    <div class="sec" style="margin:0 0 10px;"><div class="sh"><span class="st">Today's Picture</span></div><div id="ds"></div></div>
-    <div class="sec" style="margin:0 0 80px;"><div class="sh"><span class="st" id="sgtitle">Suggestions</span></div><div id="sglist"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Today's Picture</span></div><div id="ds"></div></div>
+    <div class="sec" style="margin:0 0 80px;"><div class="sh2"><span class="st" id="sgtitle">Suggestions</span></div><div id="sglist"></div></div>
   </div>
 </div>
+
 <div class="page" id="page-history">
   <div style="padding:12px 14px 0;">
-    <div class="sec" style="margin:0 0 80px;"><div class="sh"><span class="st">Food Log History</span></div><p style="font-size:12px;color:var(--t3);margin-bottom:12px;">Tap any day to expand</p><div id="hl"></div></div>
+    <div class="sec" style="margin:0 0 80px;"><div class="sh2"><span class="st">Food Log History</span></div><p style="font-size:12px;color:var(--t3);margin-bottom:12px;">Tap any day to expand</p><div id="hist-list"></div></div>
   </div>
 </div>
+
 <div class="page" id="page-trends">
   <div style="padding:12px 14px 0;">
-    <div class="sec" style="margin:0 0 10px;"><div class="sh"><span class="st">View Period</span></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">View Period</span></div>
       <div class="stb" style="margin-bottom:0;">
         <button class="sta active" onclick="setTP(7,this)">7 Days</button>
         <button class="sta" onclick="setTP(30,this)">30 Days</button>
         <button class="sta" onclick="setTP(90,this)">90 Days</button>
       </div>
     </div>
-    <div class="sec" style="margin:0 0 10px;"><div class="sh"><span class="st">Daily Averages</span></div><div id="ta"></div></div>
-    <div class="sec" style="margin:0 0 10px;"><div class="sh"><span class="st">Goal Hit Rate</span></div><div id="tg"></div></div>
-    <div class="sec" style="margin:0 0 10px;"><div class="sh"><span class="st">Most Logged Foods</span></div><div id="tf"></div></div>
-    <div class="sec" style="margin:0 0 80px;"><div class="sh"><span class="st">Calorie History</span></div><div id="tc"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Daily Averages</span></div><div id="ta"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Goal Hit Rate</span></div><div id="tg"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Most Logged Foods</span></div><div id="tf"></div></div>
+    <div class="sec" style="margin:0 0 80px;"><div class="sh2"><span class="st">Calorie History</span></div><div id="tc"></div></div>
   </div>
 </div>
+
 <button class="fab" id="fab" onclick="openModal()">+ Log Food</button>
 <input type="file" id="pi" accept="image/*" capture="environment">
 <div class="ov" id="ov"><div class="mo"><div class="db2"></div><div id="mb"></div></div></div>
+
 <script>
 var MEALS=['Breakfast','Lunch','Dinner','Snack'];
 var selMeal='Breakfast',selFood=null,tDays=7,sit='home';
 var log={Breakfast:[],Lunch:[],Dinner:[],Snack:[]};
+var syncURL='',scanActive=false;
+
+// ── Storage ──────────────────────────────────────────────────────
 function tk(){return 'nl_'+new Date().toDateString();}
 function loadDay(){var s=localStorage.getItem(tk());if(s)log=JSON.parse(s);}
-function saveDay(){localStorage.setItem(tk(),JSON.stringify(log));}
+function saveDay(){
+  localStorage.setItem(tk(),JSON.stringify(log));
+  if(syncURL) syncToSheets();
+}
 function getHist(){var s=localStorage.getItem('nl_h');return s?JSON.parse(s):{};}
 function addHist(f){var h=getHist(),k=f.name.toLowerCase().trim();h[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g',count:(h[k]?h[k].count+1:1),lastUsed:new Date().toISOString()};localStorage.setItem('nl_h',JSON.stringify(h));}
 function getFavs(){var s=localStorage.getItem('nl_f');return s?JSON.parse(s):{};}
 function toggleFav(k,f){var fv=getFavs();if(fv[k])delete fv[k];else fv[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g'};localStorage.setItem('nl_f',JSON.stringify(fv));}
 function isFav(k){return !!getFavs()[k];}
+function getSyncURL(){return localStorage.getItem('nl_sync')||'';}
+function saveSyncURL(u){localStorage.setItem('nl_sync',u);syncURL=u;}
 function clearDay(){if(!confirm('Clear all food logged today?'))return;log={Breakfast:[],Lunch:[],Dinner:[],Snack:[]};saveDay();renderAll();}
-function allDays(){var d=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('nl_')===0&&k!=='nl_h'&&k!=='nl_f'){try{var dat=JSON.parse(localStorage.getItem(k));d.push({date:k.replace('nl_',''),data:dat});}catch(e){}}}return d.sort(function(a,b){return new Date(b.date)-new Date(a.date);});}
+function allDays(){
+  var d=[];
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if(k&&k.indexOf('nl_')===0&&k!=='nl_h'&&k!=='nl_f'&&k!=='nl_sync'){
+      try{var dat=JSON.parse(localStorage.getItem(k));d.push({date:k.replace('nl_',''),data:dat});}catch(e){}
+    }
+  }
+  return d.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+}
 function dTot(data){var all=[].concat(data.Breakfast||[],data.Lunch||[],data.Dinner||[],data.Snack||[]);return all.reduce(function(a,f){return{cal:a.cal+(f.cal||0),carbs:a.carbs+(f.carbs||0),fiber:a.fiber+(f.fiber||0),protein:a.protein+(f.protein||0),sodium:a.sodium+(f.sodium||0)};},{cal:0,carbs:0,fiber:0,protein:0,sodium:0});}
+
+// ── Sync ─────────────────────────────────────────────────────────
+function updateSyncBar(){
+  var bar=document.getElementById('sync-status-bar');
+  var txt=document.getElementById('sync-status-text');
+  syncURL=getSyncURL();
+  if(syncURL){bar.style.display='flex';txt.textContent='Sync enabled — tap to sync now';}
+  else{bar.style.display='none';}
+}
+function syncToSheets(){
+  if(!syncURL)return;
+  fetch(syncURL,{method:'POST',body:JSON.stringify({action:'save',dateKey:tk(),log:log})})
+    .then(function(){document.getElementById('sync-status-text').textContent='Synced ✓ '+new Date().toLocaleTimeString();})
+    .catch(function(){document.getElementById('sync-status-text').textContent='Sync failed — check connection';});
+}
+function syncNow(){
+  if(!syncURL){showSyncSetup();return;}
+  var txt=document.getElementById('sync-status-text');
+  txt.textContent='Syncing...';
+  fetch(syncURL,{method:'POST',body:JSON.stringify({action:'load',dateKey:tk()})})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data.status==='ok'&&data.log){
+        log=data.log;saveDay();renderAll();
+        txt.textContent='Loaded from cloud ✓ '+new Date().toLocaleTimeString();
+      } else {
+        syncToSheets();
+      }
+    })
+    .catch(function(){txt.textContent='Sync failed — check connection';});
+}
+function showSyncSetup(){
+  var mb=cm2();
+  aTitle(mb,'☁️ Sync Setup','Log food on any device, see it everywhere');
+  var info=document.createElement('div');
+  info.style.cssText='font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:16px;';
+  info.innerHTML='Sync uses a free Google Sheet as your database.<br><br><strong>To set up (5 min):</strong><br>1. Go to <strong>script.google.com</strong><br>2. Click New Project<br>3. Paste the script from your GitHub repo (gas_sync.js)<br>4. Click Deploy → New Deployment → Web App<br>5. Set access to <strong>Anyone</strong><br>6. Copy the URL and paste below';
+  mb.appendChild(info);
+  var fw=document.createElement('div');fw.className='fw';
+  var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Your Google Apps Script URL:';
+  var inp=document.createElement('input');inp.type='text';inp.id='sync-url-inp';inp.placeholder='https://script.google.com/macros/s/...';
+  var existing=getSyncURL();
+  if(existing)inp.value=existing;
+  fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);
+  mb.appendChild(mkBtn('pri','Save & Enable Sync',function(){
+    var u=document.getElementById('sync-url-inp').value.trim();
+    if(!u){alert('Please enter a URL');return;}
+    saveSyncURL(u);updateSyncBar();closeModal();
+    alert('Sync enabled! Tap "Sync Now" in the bar to sync your data.');
+  }));
+  if(getSyncURL()){mb.appendChild(mkBtn('sec','Disable Sync',function(){saveSyncURL('');updateSyncBar();closeModal();}));}
+  mb.appendChild(mkBtn('sec','Cancel',closeModal));
+}
+
+// ── Init ─────────────────────────────────────────────────────────
 document.getElementById('dp').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-loadDay();renderAll();
+syncURL=getSyncURL();
+loadDay();renderAll();updateSyncBar();
+
+// ── Page nav ─────────────────────────────────────────────────────
 function showPage(n,btn){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('active');});document.getElementById('page-'+n).classList.add('active');btn.classList.add('active');document.getElementById('fab').className=n==='log'?'fab':'fab hid';if(n==='suggest')renderSuggest();if(n==='history')renderHistory();if(n==='trends')renderTrends();}
+
+// ── Render today ─────────────────────────────────────────────────
 function getTot(){return[].concat(log.Breakfast,log.Lunch,log.Dinner,log.Snack).reduce(function(a,f){return{cal:a.cal+(f.cal||0),carbs:a.carbs+(f.carbs||0),fiber:a.fiber+(f.fiber||0),protein:a.protein+(f.protein||0),sodium:a.sodium+(f.sodium||0)};},{cal:0,carbs:0,fiber:0,protein:0,sodium:0});}
 function bc(v,g,mn){var p=(v/g)*100;if(mn)return p>=70?'':(p>=40?'w':'o');return p>100?'o':(p>85?'w':'');}
 function renderAll(){
@@ -308,72 +411,392 @@ function renderAll(){
     var c=cfg[k],v=Math.round(t[k]);
     document.getElementById('sv-'+k).textContent=v+c.u;
     var p=Math.min((t[k]/c.g)*100,100),cls=bc(t[k],c.g,c.mn);
-    document.getElementById('sb-'+k).style.width=p+'%';
-    document.getElementById('sb-'+k).className='sbf'+(cls?' '+cls:'');
-    document.getElementById('gf-'+k).style.width=p+'%';
-    document.getElementById('gf-'+k).className='gf'+(cls?' '+cls:'');
+    document.getElementById('sb-'+k).style.width=p+'%';document.getElementById('sb-'+k).className='sbf'+(cls?' '+cls:'');
+    document.getElementById('gf-'+k).style.width=p+'%';document.getElementById('gf-'+k).className='gf'+(cls?' '+cls:'');
     document.getElementById('gn-'+k).textContent=k==='cal'?v+' / 2000':k==='sodium'?v+'mg / 2300mg':v+'g / '+c.g+'g';
   });
   var pf=document.getElementById('pfw');
   if(t.cal===0){pf.innerHTML='<div class="pc pend">Log a meal to see status</div>';}
-  else{pf.innerHTML=[{l:'Calories',f:t.cal>2000},{l:'Carbs',f:t.carbs>130},{l:'Fiber',p:t.fiber<20},{l:'Protein',p:t.protein<100},{l:'Sodium',f:t.sodium>2300}].map(function(c){return c.f?'<div class="pc fail">\u2717 '+c.l+'</div>':c.p?'<div class="pc prog">\u2192 '+c.l+'</div>':'<div class="pc pass">\u2713 '+c.l+'</div>';}).join('');}
+  else{pf.innerHTML=[{l:'Calories',f:t.cal>2000},{l:'Carbs',f:t.carbs>130},{l:'Fiber',p:t.fiber<20},{l:'Protein',p:t.protein<100},{l:'Sodium',f:t.sodium>2300}].map(function(c){return c.f?'<div class="pc fail">✗ '+c.l+'</div>':c.p?'<div class="pc prog">→ '+c.l+'</div>':'<div class="pc pass">✓ '+c.l+'</div>';}).join('');}
   var mc=document.getElementById('mc');mc.innerHTML='';
   MEALS.forEach(function(meal){
     var items=log[meal]||[],mcal=items.reduce(function(a,f){return a+(f.cal||0);},0);
     var div=document.createElement('div');div.className='mg';
-    var lbl=document.createElement('div');lbl.className='ml';
-    lbl.innerHTML='<span class="mn">'+meal+'</span>'+(mcal>0?'<span class="mc">'+Math.round(mcal)+' cal</span>':'');
+    var lbl=document.createElement('div');lbl.className='ml2';
+    lbl.innerHTML='<span class="mn">'+meal+'</span>'+(mcal>0?'<span class="mcc">'+Math.round(mcal)+' cal</span>':'');
     div.appendChild(lbl);
     if(!items.length){var en=document.createElement('div');en.className='en';en.textContent='Nothing logged yet';div.appendChild(en);}
     else{items.forEach(function(f,i){
       var card=document.createElement('div');card.className='fc';
       var left=document.createElement('div');left.className='fl';
-      left.innerHTML='<div class="fn">'+f.name+'</div>'+(f.brand?'<div class="fb">'+f.brand+'</div>':'')+'<div class="fch"><span class="ch">\ud83c\udf5e '+f.carbs+'g</span><span class="ch fi">\ud83c\udf3f '+f.fiber+'g</span><span class="ch">\ud83d\udcaa '+f.protein+'g</span><span class="ch">\ud83e\uddc2 '+f.sodium+'mg</span>'+(f.sugar>0?'<span class="ch su">\ud83c\udf6c '+f.sugar+'g</span>':'')+'</div>';
+      left.innerHTML='<div class="fn">'+f.name+'</div>'+(f.brand?'<div class="fbr">'+f.brand+'</div>':'')+'<div class="fch"><span class="ch">🍞 '+f.carbs+'g</span><span class="ch fi">🌿 '+f.fiber+'g</span><span class="ch">💪 '+f.protein+'g</span><span class="ch">🧂 '+f.sodium+'mg</span>'+(f.sugar>0?'<span class="ch su">🍬 '+f.sugar+'g</span>':'')+'</div>';
       var right=document.createElement('div');right.className='fr';
       right.innerHTML='<div class="fca">'+f.cal+'</div><div class="fcl">cal</div>';
-      var db=document.createElement('button');db.className='db';db.textContent='\u00d7';
+      var db=document.createElement('button');db.className='db';db.textContent='×';
       (function(m,idx){db.onclick=function(){log[m].splice(idx,1);saveDay();renderAll();};})(meal,i);
       right.appendChild(db);card.appendChild(left);card.appendChild(right);div.appendChild(card);
     });}
     mc.appendChild(div);
   });
 }
+
+// ── Modal ─────────────────────────────────────────────────────────
 function openModal(){document.getElementById('ov').classList.add('open');showMS();}
-function closeModal(){document.getElementById('ov').classList.remove('open');selFood=null;}
+function closeModal(){stopScan();document.getElementById('ov').classList.remove('open');selFood=null;}
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===document.getElementById('ov'))closeModal();});
 function cm2(){var mb=document.getElementById('mb');mb.innerHTML='';return mb;}
 function aTitle(mb,title,sub){var h=document.createElement('div');h.style.cssText='font-family:Fraunces,serif;font-size:22px;color:var(--ac);margin-bottom:4px;';h.textContent=title;mb.appendChild(h);if(sub){var s=document.createElement('p');s.style.cssText='font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.4;';s.textContent=sub;mb.appendChild(s);}}
 function aMTabs(mb){var d=document.createElement('div');d.className='mts';MEALS.forEach(function(m){var b=document.createElement('button');b.className='mt'+(m===selMeal?' active':'');b.textContent=m;b.onclick=function(){selMeal=m;document.querySelectorAll('.mt').forEach(function(t){t.classList.remove('active');});b.classList.add('active');};d.appendChild(b);});mb.appendChild(d);}
 function mkBtn(cls,txt,fn){var b=document.createElement('button');b.className='ab '+cls;b.textContent=txt;b.onclick=fn;return b;}
-function showMS(){var mb=cm2();aTitle(mb,'Log Food','Choose how to add your meal');aMTabs(mb);var gr=document.createElement('div');gr.className='mgr';[{i:'\ud83d\udd0d',l:'Search',fn:showSearch},{i:'\ud83d\udd50',l:'Recent & Favs',fn:function(){showFH('recent');}},{i:'\ud83d\udcf7',l:'Scan Barcode',fn:showBC}].forEach(function(item){var btn=document.createElement('div');btn.className='mbt';btn.innerHTML='<div class="mi">'+item.i+'</div><div class="mlb">'+item.l+'</div>';btn.onclick=item.fn;gr.appendChild(btn);});mb.appendChild(gr);mb.appendChild(mkBtn('sec','Cancel',closeModal));}
-function showSearch(){var mb=cm2();aTitle(mb,'Search Food','Millions of branded products');aMTabs(mb);var fw=document.createElement('div');fw.className='fw';var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='What did you eat?';var inp=document.createElement('input');inp.type='text';inp.id='si2';inp.placeholder='e.g. Cheerios, Aldi salmon, chicken breast...';inp.onkeydown=function(e){if(e.key==='Enter')doSearch();};fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);mb.appendChild(mkBtn('pri','Search \u2192',doSearch));mb.appendChild(mkBtn('sec','\u2190 Back',showMS));setTimeout(function(){var el=document.getElementById('si2');if(el)el.focus();},100);}
-function doSearch(){var inp=document.getElementById('si2');var q=inp?inp.value.trim():'';if(!q)return;showLoad('Searching for '+q+'...');fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity').then(function(r){if(!r.ok)throw new Error('net');return r.json();}).then(function(data){var ps=(data.products||[]).filter(function(p){var n=p.nutriments||{};return(p.product_name||'').trim().length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);}).slice(0,6);if(!ps.length){showNF(q);return;}window._res=ps.map(parseOFF);showRes(window._res,q);}).catch(function(){showNF(q);});}
-function showNF(q){var mb=cm2();aTitle(mb,'Not Found','');var eb=document.createElement('div');eb.className='eb';eb.textContent='"'+q+'" could not be found. Try a different name, add a brand (e.g. "General Mills Cheerios"), or use a simpler term.';mb.appendChild(eb);mb.appendChild(mkBtn('pri','\u2190 Try Again',showSearch));mb.appendChild(mkBtn('sec','Cancel',closeModal));}
-function parseOFF(p){var n=p.nutriments||{},name=(p.product_name||'Unknown').trim(),brand=(p.brands||'').split(',')[0].trim(),srv=parseFloat(p.serving_quantity)||100,r=srv/100;function g(k){return parseFloat(n[k+'_100g']||n[k]||0);}function gs(k){return n[k+'_serving']!=null?parseFloat(n[k+'_serving']||0):g(k)*r;}var cal=Math.round(gs('energy-kcal')||g('energy-kcal')*r),carbs=Math.round(gs('carbohydrates')||g('carbohydrates')*r),fiber=Math.round(gs('fiber')||g('fiber')*r),protein=Math.round(gs('proteins')||g('proteins')*r),sodG=gs('sodium')||g('sodium')*r,sodium=Math.round(sodG*1000),sugar=Math.round(gs('sugars')||g('sugars')*r);return{name:name,brand:brand,cal:cal,carbs:carbs,fiber:fiber,protein:protein,sodium:sodium,sugar:sugar,servingSize:Math.round(srv),servingUnit:'g'};}
-function showRes(foods,q){var mb=cm2();aTitle(mb,'Results','Tap to select');aMTabs(mb);foods.forEach(function(f,i){var d=document.createElement('div');d.className='ri';d.id='ri'+i;d.innerHTML='<div class="rn">'+f.name+'</div>'+(f.brand?'<div class="rbr">'+f.brand+'</div>':'')+'<div class="rm"><span>\ud83d\udd25 '+f.cal+' cal</span><span>\ud83c\udf5e '+f.carbs+'g</span><span>\ud83c\udf3f '+f.fiber+'g</span><span>\ud83d\udcaa '+f.protein+'g</span></div>';(function(idx){d.onclick=function(){document.querySelectorAll('.ri').forEach(function(el){el.classList.remove('sel');});var el=document.getElementById('ri'+idx);if(el)el.classList.add('sel');selFood=window._res[idx];showConf(selFood,false,null);};})(i);mb.appendChild(d);});mb.appendChild(mkBtn('sec','\u2190 Search Again',showSearch));}
-function showFH(tab){var hist=getHist(),favs=getFavs(),items=tab==='favs'?Object.values(favs):Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);});var mb=cm2();aTitle(mb,tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);var tabs=document.createElement('div');tabs.className='stb';var r=document.createElement('button');r.className='sta'+(tab==='recent'?' active':'');r.textContent='\ud83d\udd50 Recent';r.onclick=function(){showFH('recent');};var f2=document.createElement('button');f2.className='sta'+(tab==='favs'?' active':'');f2.textContent='\u2b50 Favorites';f2.onclick=function(){showFH('favs');};tabs.appendChild(r);tabs.appendChild(f2);mb.appendChild(tabs);
-if(!items.length){var em=document.createElement('div');em.className='ehi';em.textContent=tab==='favs'?'No favorites yet':'No history yet';mb.appendChild(em);}
-else{items.forEach(function(f){var k=f.name.toLowerCase().trim(),row=document.createElement('div');row.className='hi';var left=document.createElement('div');left.className='hl';left.innerHTML='<div class="hn">'+f.name+'</div>'+(f.brand?'<div class="hb">'+f.brand+'</div>':'')+'<div class="hm"><span>\ud83d\udd25 '+f.cal+' cal</span><span>\ud83c\udf5e '+f.carbs+'g</span><span>\ud83c\udf3f '+f.fiber+'g</span><span>\ud83d\udcaa '+f.protein+'g</span></div>';var right=document.createElement('div');right.className='hri';right.innerHTML='<div class="hc">'+f.cal+'</div>';var fb=document.createElement('button');fb.className='fvb';fb.textContent=isFav(k)?'\u2b50':'\u2606';(function(fk,food,btn){btn.onclick=function(e){e.stopPropagation();toggleFav(fk,food);btn.textContent=isFav(fk)?'\u2b50':'\u2606';};})(k,f,fb);right.appendChild(fb);if(f.count){var cn=document.createElement('div');cn.className='hco';cn.textContent='x'+f.count;right.appendChild(cn);}row.appendChild(left);row.appendChild(right);(function(food){row.onclick=function(){selFood=food;showConf(food,false,null);};})(f);mb.appendChild(row);});}
-mb.appendChild(mkBtn('sec','\u2190 Back',showMS));}
-function showBC(){var mb=cm2();aTitle(mb,'Scan Barcode','Look up any packaged food by barcode');aMTabs(mb);var drop=document.createElement('div');drop.className='pd';drop.innerHTML='<div class="pdi">\ud83d\udcf7</div><div class="pdl">Tap to use camera</div><div class="pds">Take a photo of the barcode on the package</div>';drop.onclick=function(){document.getElementById('pi').click();};mb.appendChild(drop);var fw=document.createElement('div');fw.className='fw';var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Or type the barcode number:';var inp=document.createElement('input');inp.type='text';inp.id='bi';inp.placeholder='e.g. 016000275270';inp.setAttribute('inputmode','numeric');inp.onkeydown=function(e){if(e.key==='Enter')lookupBC();};fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);mb.appendChild(mkBtn('pri','Look Up Barcode \u2192',lookupBC));mb.appendChild(mkBtn('sec','\u2190 Back',showMS));}
-document.getElementById('pi').addEventListener('change',function(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(ev){var mb=cm2();aTitle(mb,'Enter Barcode','Type the number from the barcode in your photo');aMTabs(mb);var img=document.createElement('img');img.src=ev.target.result;img.style.cssText='width:100%;border-radius:10px;max-height:180px;object-fit:cover;margin-bottom:12px;border:2px solid var(--bd);';mb.appendChild(img);var fw=document.createElement('div');fw.className='fw';var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Enter the barcode number:';var inp=document.createElement('input');inp.type='text';inp.id='bi';inp.placeholder='e.g. 016000275270';inp.setAttribute('inputmode','numeric');inp.onkeydown=function(e){if(e.key==='Enter')lookupBC();};fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);mb.appendChild(mkBtn('pri','Look Up \u2192',lookupBC));mb.appendChild(mkBtn('sec','\u2190 Back',showMS));setTimeout(function(){if(inp)inp.focus();},100);};reader.readAsDataURL(file);this.value='';});
-function lookupBC(){var inp=document.getElementById('bi'),barcode=inp?inp.value.trim().replace(/[^0-9]/g,''):'';if(!barcode){if(inp)inp.focus();return;}showLoad('Looking up barcode '+barcode+'...');fetch('https://world.openfoodfacts.org/api/v0/product/'+barcode+'.json').then(function(r){return r.json();}).then(function(data){if(data.status!==1||!data.product){var mb=cm2();aTitle(mb,'Not Found','');var eb=document.createElement('div');eb.className='eb';eb.textContent='Barcode '+barcode+' was not found. Try searching by name instead.';mb.appendChild(eb);mb.appendChild(mkBtn('pri','Search by Name',showSearch));mb.appendChild(mkBtn('sec','Cancel',closeModal));return;}var food=parseOFF(data.product);food.scanned=true;selFood=food;showConf(food,true,null);}).catch(function(){var mb=cm2();aTitle(mb,'Not Found','');var eb=document.createElement('div');eb.className='eb';eb.textContent='Could not look up this barcode. Try searching by name instead.';mb.appendChild(eb);mb.appendChild(mkBtn('pri','Search by Name',showSearch));mb.appendChild(mkBtn('sec','Cancel',closeModal));});}
-function htip(f){if(f.sugar>15)return'High in sugar ('+f.sugar+'g) \u2014 can raise triglycerides.';if(f.fiber>=4)return'Good fiber source ('+f.fiber+'g) \u2014 helps blood sugar and cholesterol.';if(f.carbs>40&&f.fiber<3)return'High refined carbs \u2014 moderate portions help keep triglycerides in check.';if(f.protein>=20)return'High protein \u2014 supports satiety and blood sugar stability.';if(f.sodium>600)return'High sodium ('+f.sodium+'mg) \u2014 watch your daily total.';return'';}
-function showConf(f,scanned,preview){var mb=cm2();aTitle(mb,'Confirm & Add','Adding to '+selMeal);aMTabs(mb);if(scanned){var sb=document.createElement('div');sb.style.cssText='display:inline-flex;align-items:center;gap:5px;background:var(--gp);border:1px solid var(--gd);border-radius:16px;padding:3px 9px;font-size:11px;font-weight:700;color:var(--gd);margin-bottom:10px;';sb.textContent='\ud83d\udcf7 Scanned from barcode';mb.appendChild(sb);}if(preview){var img=document.createElement('img');img.src=preview;img.style.cssText='width:100%;border-radius:10px;max-height:180px;object-fit:cover;margin-bottom:12px;';mb.appendChild(img);}var tip=htip(f),card=document.createElement('div');card.className='cc';card.innerHTML='<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr">'+f.brand+'</div>':'')+'<div class="cm"><div class="cma"><div class="cmv">'+f.cal+'</div><div class="cml">Cal</div></div><div class="cma"><div class="cmv">'+f.carbs+'g</div><div class="cml">Carbs</div></div><div class="cma"><div class="cmv">'+f.fiber+'g</div><div class="cml">Fiber</div></div><div class="cma"><div class="cmv">'+f.protein+'g</div><div class="cml">Protein</div></div><div class="cma"><div class="cmv">'+f.sodium+'mg</div><div class="cml">Sodium</div></div></div>'+(tip?'<div class="ct">\ud83d\udca1 '+tip+'</div>':'');mb.appendChild(card);var sr=document.createElement('div');sr.className='sv2';var sl=document.createElement('label');sl.textContent='Servings:';var si=document.createElement('input');si.type='number';si.id='svi';si.value='1';si.min='0.25';si.max='20';si.step='0.25';var su=document.createElement('span');su.className='su2';su.textContent='x '+(f.servingSize||100)+(f.servingUnit||'g');sr.appendChild(sl);sr.appendChild(si);sr.appendChild(su);mb.appendChild(sr);mb.appendChild(mkBtn('pri','\u2713 Add to '+selMeal,addFood));mb.appendChild(mkBtn('sec','\u2190 Back',showMS));}
-function addFood(){if(!selFood)return;var si=document.getElementById('svi'),s=si?parseFloat(si.value)||1:1,f=selFood,entry={name:f.name,brand:f.brand||'',cal:Math.round(f.cal*s),carbs:Math.round(f.carbs*s),fiber:Math.round(f.fiber*s),protein:Math.round(f.protein*s),sodium:Math.round(f.sodium*s),sugar:Math.round((f.sugar||0)*s),scanned:f.scanned||false};log[selMeal].push(entry);addHist(entry);saveDay();renderAll();closeModal();}
+
+// ── Method select (2x2 grid) ──────────────────────────────────────
+function showMS(){
+  var mb=cm2();
+  aTitle(mb,'Log Food','Choose how to add your meal');
+  aMTabs(mb);
+  var gr=document.createElement('div');gr.className='mgr';
+  [{i:'🔍',l:'Search',fn:showSearch},{i:'⏰',l:'Recent & Favs',fn:function(){showFH('recent');}},{i:'📷',l:'Scan Barcode',fn:showBC},{i:'✏️',l:'Enter Manually',fn:showManual}].forEach(function(item){
+    var btn=document.createElement('div');btn.className='mbt';
+    btn.innerHTML='<div class="mi">'+item.i+'</div><div class="mlb">'+item.l+'</div>';
+    btn.onclick=item.fn;gr.appendChild(btn);
+  });
+  mb.appendChild(gr);
+  mb.appendChild(mkBtn('sec','Cancel',closeModal));
+}
+
+// ── Search (Open Food Facts v2) ───────────────────────────────────
+function showSearch(){
+  var mb=cm2();
+  aTitle(mb,'Search Food','Branded products database');
+  aMTabs(mb);
+  var fw=document.createElement('div');fw.className='fw';
+  var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='What did you eat?';
+  var inp=document.createElement('input');inp.type='text';inp.id='si2';
+  inp.placeholder='e.g. Cheerios, Aldi salmon, chicken breast...';
+  inp.onkeydown=function(e){if(e.key==='Enter')doSearch();};
+  fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);
+  mb.appendChild(mkBtn('pri','Search →',doSearch));
+  mb.appendChild(mkBtn('sec','← Back',showMS));
+  setTimeout(function(){var el=document.getElementById('si2');if(el)el.focus();},100);
+}
+
+function doSearch(){
+  var inp=document.getElementById('si2');
+  var q=inp?inp.value.trim():'';
+  if(!q)return;
+  showLoad('Searching for '+q+'...');
+  // Use OFF v2 search API - same CORS policy as barcode lookup which works
+  var url='https://world.openfoodfacts.org/api/v2/search?search_terms='+encodeURIComponent(q)+'&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity,product_quantity&sort_by=unique_scans_n';
+  fetch(url)
+    .then(function(r){
+      if(!r.ok)throw new Error('http '+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      var ps=(data.products||[]).filter(function(p){
+        var n=p.nutriments||{};
+        var nm=(p.product_name||'').trim();
+        return nm.length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']||n['energy-kcal']);
+      }).slice(0,6);
+      if(!ps.length){showNF(q);return;}
+      window._res=ps.map(parseOFF);
+      showRes(window._res);
+    })
+    .catch(function(err){
+      // Try fallback endpoint
+      var url2='https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(q)+'&search_simple=1&action=process&json=1&page_size=10&fields=product_name,brands,nutriments,serving_size,serving_quantity';
+      fetch(url2)
+        .then(function(r){return r.json();})
+        .then(function(data){
+          var ps=(data.products||[]).filter(function(p){var n=p.nutriments||{};return(p.product_name||'').trim().length>0&&(n['energy-kcal_100g']||n['energy-kcal_serving']);}).slice(0,6);
+          if(!ps.length){showNF(q);return;}
+          window._res=ps.map(parseOFF);showRes(window._res);
+        })
+        .catch(function(){showNF(q);});
+    });
+}
+
+function showNF(q){
+  var mb=cm2();
+  aTitle(mb,'Not Found','');
+  var eb=document.createElement('div');eb.className='eb';
+  eb.textContent='"'+q+'" could not be found. Try a different name, add a brand name, or use Enter Manually to add it yourself.';
+  mb.appendChild(eb);
+  mb.appendChild(mkBtn('pri','← Try Again',showSearch));
+  mb.appendChild(mkBtn('sec','Enter Manually Instead',showManual));
+  mb.appendChild(mkBtn('sec','Cancel',closeModal));
+}
+
+function parseOFF(p){
+  var n=p.nutriments||{},name=(p.product_name||'Unknown').trim(),brand=(p.brands||'').split(',')[0].trim();
+  var srv=parseFloat(p.serving_quantity)||100,r=srv/100;
+  function g(k){return parseFloat(n[k+'_100g']||n[k]||0);}
+  function gs(k){return n[k+'_serving']!=null?parseFloat(n[k+'_serving']||0):g(k)*r;}
+  var cal=Math.round(gs('energy-kcal')||g('energy-kcal')*r);
+  var carbs=Math.round(gs('carbohydrates')||g('carbohydrates')*r);
+  var fiber=Math.round(gs('fiber')||g('fiber')*r);
+  var protein=Math.round(gs('proteins')||g('proteins')*r);
+  var sodG=gs('sodium')||g('sodium')*r;
+  var sodium=Math.round(sodG*1000);
+  var sugar=Math.round(gs('sugars')||g('sugars')*r);
+  return{name:name,brand:brand,cal:cal,carbs:carbs,fiber:fiber,protein:protein,sodium:sodium,sugar:sugar,servingSize:Math.round(srv),servingUnit:'g'};
+}
+
+function showRes(foods){
+  var mb=cm2();aTitle(mb,'Results','Tap to select');aMTabs(mb);
+  foods.forEach(function(f,i){
+    var d=document.createElement('div');d.className='ri';d.id='ri'+i;
+    d.innerHTML='<div class="rn">'+f.name+'</div>'+(f.brand?'<div class="rbr">'+f.brand+'</div>':'')+'<div class="rm"><span>🔥 '+f.cal+' cal</span><span>🍞 '+f.carbs+'g</span><span>🌿 '+f.fiber+'g</span><span>💪 '+f.protein+'g</span></div>';
+    (function(idx){d.onclick=function(){document.querySelectorAll('.ri').forEach(function(el){el.classList.remove('sel');});var el=document.getElementById('ri'+idx);if(el)el.classList.add('sel');selFood=window._res[idx];showConf(selFood,false);};})(i);
+    mb.appendChild(d);
+  });
+  mb.appendChild(mkBtn('sec','← Search Again',showSearch));
+}
+
+// ── Recent & Favs ─────────────────────────────────────────────────
+function showFH(tab){
+  var hist=getHist(),favs=getFavs();
+  var items=tab==='favs'?Object.values(favs):Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);});
+  var mb=cm2();aTitle(mb,tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);
+  var tabs=document.createElement('div');tabs.className='stb';
+  var r=document.createElement('button');r.className='sta'+(tab==='recent'?' active':'');r.textContent='⏰ Recent';r.onclick=function(){showFH('recent');};
+  var f2=document.createElement('button');f2.className='sta'+(tab==='favs'?' active':'');f2.textContent='⭐ Favorites';f2.onclick=function(){showFH('favs');};
+  tabs.appendChild(r);tabs.appendChild(f2);mb.appendChild(tabs);
+  if(!items.length){var em=document.createElement('div');em.className='ehi';em.textContent=tab==='favs'?'No favorites yet':'No history yet';mb.appendChild(em);}
+  else{items.forEach(function(f){
+    var k=f.name.toLowerCase().trim(),row=document.createElement('div');row.className='hi';
+    var left=document.createElement('div');left.className='hl2';
+    left.innerHTML='<div class="hn">'+f.name+'</div>'+(f.brand?'<div class="hb">'+f.brand+'</div>':'')+'<div class="hm"><span>🔥 '+f.cal+' cal</span><span>🍞 '+f.carbs+'g</span><span>🌿 '+f.fiber+'g</span><span>💪 '+f.protein+'g</span></div>';
+    var right=document.createElement('div');right.className='hri';
+    right.innerHTML='<div class="hcc">'+f.cal+'</div>';
+    var fb=document.createElement('button');fb.className='fvb';fb.textContent=isFav(k)?'⭐':'☆';
+    (function(fk,food,btn){btn.onclick=function(e){e.stopPropagation();toggleFav(fk,food);btn.textContent=isFav(fk)?'⭐':'☆';};})(k,f,fb);
+    right.appendChild(fb);
+    if(f.count){var cn=document.createElement('div');cn.className='hco';cn.textContent='x'+f.count;right.appendChild(cn);}
+    row.appendChild(left);row.appendChild(right);
+    (function(food){row.onclick=function(){selFood=food;showConf(food,false);};})(f);
+    mb.appendChild(row);
+  });}
+  mb.appendChild(mkBtn('sec','← Back',showMS));
+}
+
+// ── Barcode scan ──────────────────────────────────────────────────
+function showBC(){
+  var mb=cm2();
+  aTitle(mb,'Scan Barcode','Point camera at barcode or enter manually');
+  aMTabs(mb);
+  // Camera live scan
+  var scanWrap=document.createElement('div');
+  scanWrap.id='bc-scanner-wrap';
+  scanWrap.className='bc-scanner-wrap';
+  scanWrap.style.cssText='position:relative;width:100%;border-radius:10px;overflow:hidden;margin-bottom:12px;background:#000;min-height:220px;';
+  scanWrap.innerHTML='<div id="bc-video-container" style="width:100%;"></div><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;"><div style="width:80%;max-width:260px;height:80px;border:3px solid #4B9CD3;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,0.45);"></div></div><div id="bc-status" style="position:absolute;bottom:8px;left:0;right:0;text-align:center;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);">Initializing camera...</div>';
+  mb.appendChild(scanWrap);
+  // Manual fallback
+  var fw=document.createElement('div');fw.className='fw';
+  var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Or type barcode number:';
+  var inp=document.createElement('input');inp.type='text';inp.id='bi';inp.placeholder='e.g. 016000275270';inp.setAttribute('inputmode','numeric');
+  inp.onkeydown=function(e){if(e.key==='Enter')lookupBC();};
+  fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);
+  mb.appendChild(mkBtn('pri','Look Up →',lookupBC));
+  mb.appendChild(mkBtn('sec','← Back',showMS));
+  // Start QuaggaJS scanner
+  setTimeout(function(){startScan();},300);
+}
+
+function startScan(){
+  if(typeof Quagga==='undefined'){
+    var el=document.getElementById('bc-status');
+    if(el)el.textContent='Camera scanner unavailable — enter barcode manually';
+    return;
+  }
+  scanActive=true;
+  Quagga.init({
+    inputStream:{type:'LiveStream',target:document.getElementById('bc-video-container'),constraints:{facingMode:'environment',width:640,height:480}},
+    decoder:{readers:['ean_reader','ean_8_reader','upc_reader','upc_e_reader','code_128_reader','code_39_reader']},
+    locate:true,
+    numOfWorkers:0
+  },function(err){
+    if(err){
+      var el=document.getElementById('bc-status');
+      if(el)el.textContent='Camera unavailable — enter barcode manually below';
+      return;
+    }
+    Quagga.start();
+    var el=document.getElementById('bc-status');
+    if(el)el.textContent='🔍 Point at barcode...';
+  });
+  var lastCode='',lastTime=0;
+  Quagga.onDetected(function(result){
+    var code=result.codeResult.code;
+    var now=Date.now();
+    if(code===lastCode&&now-lastTime<2000)return;
+    lastCode=code;lastTime=now;
+    // Flash feedback
+    var el=document.getElementById('bc-status');
+    if(el)el.textContent='✓ Found: '+code;
+    stopScan();
+    lookupBarcodeStr(code);
+  });
+}
+
+function stopScan(){
+  if(!scanActive)return;
+  scanActive=false;
+  try{if(typeof Quagga!=='undefined'){Quagga.stop();}}catch(e){}
+}
+
+document.getElementById('pi').addEventListener('change',function(e){
+  // Fallback: if user picks image file, try QuaggaJS on it
+  var file=e.target.files[0];if(!file)return;
+  if(typeof Quagga==='undefined'){
+    // Show manual entry with photo preview
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var mb=cm2();aTitle(mb,'Enter Barcode','Type the number from the barcode in your photo');aMTabs(mb);
+      var img=document.createElement('img');img.src=ev.target.result;img.style.cssText='width:100%;border-radius:10px;max-height:180px;object-fit:cover;margin-bottom:12px;border:2px solid var(--bd);';mb.appendChild(img);
+      var fw=document.createElement('div');fw.className='fw';var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Enter the barcode number:';var inp=document.createElement('input');inp.type='text';inp.id='bi';inp.placeholder='e.g. 016000275270';inp.setAttribute('inputmode','numeric');inp.onkeydown=function(e){if(e.key==='Enter')lookupBC();};fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);
+      mb.appendChild(mkBtn('pri','Look Up →',lookupBC));mb.appendChild(mkBtn('sec','← Back',showMS));
+      setTimeout(function(){if(inp)inp.focus();},100);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    showLoad('Reading barcode from photo...');
+    Quagga.decodeSingle({src:URL.createObjectURL(file),numOfWorkers:0,decoder:{readers:['ean_reader','ean_8_reader','upc_reader','upc_e_reader','code_128_reader']}},function(result){
+      if(result&&result.codeResult&&result.codeResult.code){
+        lookupBarcodeStr(result.codeResult.code);
+      } else {
+        // Show manual entry
+        var mb=cm2();aTitle(mb,'Barcode Not Read','');
+        var eb=document.createElement('div');eb.className='eb';eb.textContent='Could not automatically read the barcode. Please type the number manually.';mb.appendChild(eb);
+        var fw=document.createElement('div');fw.className='fw';var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Barcode number:';var inp=document.createElement('input');inp.type='text';inp.id='bi';inp.placeholder='e.g. 016000275270';inp.setAttribute('inputmode','numeric');inp.onkeydown=function(e){if(e.key==='Enter')lookupBC();};fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);
+        mb.appendChild(mkBtn('pri','Look Up →',lookupBC));mb.appendChild(mkBtn('sec','← Back',showMS));
+        setTimeout(function(){if(inp)inp.focus();},100);
+      }
+    });
+  }
+  this.value='';
+});
+
+function lookupBC(){
+  var inp=document.getElementById('bi');
+  var code=inp?inp.value.trim().replace(/[^0-9]/g,''):'';
+  if(!code){if(inp)inp.focus();return;}
+  lookupBarcodeStr(code);
+}
+
+function lookupBarcodeStr(code){
+  stopScan();
+  showLoad('Looking up barcode '+code+'...');
+  fetch('https://world.openfoodfacts.org/api/v0/product/'+code+'.json')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if(data.status!==1||!data.product){
+        var mb=cm2();aTitle(mb,'Not Found','');
+        var eb=document.createElement('div');eb.className='eb';eb.textContent='Barcode '+code+' was not found. Try searching by name or enter manually.';mb.appendChild(eb);
+        mb.appendChild(mkBtn('pri','Search by Name',showSearch));
+        mb.appendChild(mkBtn('sec','Enter Manually',showManual));
+        mb.appendChild(mkBtn('sec','Cancel',closeModal));
+        return;
+      }
+      var food=parseOFF(data.product);food.scanned=true;selFood=food;showConf(food,true);
+    })
+    .catch(function(){
+      var mb=cm2();aTitle(mb,'Not Found','');
+      var eb=document.createElement('div');eb.className='eb';eb.textContent='Could not look up this barcode. Try searching by name or enter manually.';mb.appendChild(eb);
+      mb.appendChild(mkBtn('pri','Search by Name',showSearch));
+      mb.appendChild(mkBtn('sec','Enter Manually',showManual));
+      mb.appendChild(mkBtn('sec','Cancel',closeModal));
+    });
+}
+
+// ── Manual entry ──────────────────────────────────────────────────
+function showManual(prefillName){
+  var mb=cm2();
+  aTitle(mb,'Enter Manually','Type in the food details yourself');
+  aMTabs(mb);
+  var nfw=document.createElement('div');nfw.className='fw';
+  var nlbl=document.createElement('label');nlbl.className='fl2';nlbl.textContent='Food name (required)';
+  var ninp=document.createElement('input');ninp.type='text';ninp.id='m-name';ninp.placeholder='e.g. Aldi Air Fryer Salmon';
+  if(prefillName&&typeof prefillName==='string')ninp.value=prefillName;
+  nfw.appendChild(nlbl);nfw.appendChild(ninp);mb.appendChild(nfw);
+  var bfw=document.createElement('div');bfw.className='fw';
+  var blbl=document.createElement('label');blbl.className='fl2';blbl.textContent='Brand (optional)';
+  var binp=document.createElement('input');binp.type='text';binp.id='m-brand';binp.placeholder='e.g. Aldi, Homemade';
+  bfw.appendChild(blbl);bfw.appendChild(binp);mb.appendChild(bfw);
+  var grid=document.createElement('div');grid.className='mgrid2';
+  var fields=[{id:'m-cal',lbl:'Calories',ph:'e.g. 280'},{id:'m-carbs',lbl:'Carbs (g)',ph:'e.g. 0'},{id:'m-fiber',lbl:'Fiber (g)',ph:'e.g. 0'},{id:'m-protein',lbl:'Protein (g)',ph:'e.g. 35'},{id:'m-sodium',lbl:'Sodium (mg)',ph:'e.g. 120'},{id:'m-sugar',lbl:'Sugar (g)',ph:'e.g. 0'}];
+  fields.forEach(function(f){
+    var wrap=document.createElement('div');wrap.className='nutr-inp fw';
+    var lbl=document.createElement('label');lbl.textContent=f.lbl;
+    var inp=document.createElement('input');inp.type='number';inp.id=f.id;inp.placeholder=f.ph;inp.min='0';inp.className='nutr-inp';
+    wrap.appendChild(lbl);wrap.appendChild(inp);grid.appendChild(wrap);
+  });
+  mb.appendChild(grid);
+  mb.appendChild(mkBtn('pri','✓ Add Food',addManual));
+  mb.appendChild(mkBtn('sec','← Back',showMS));
+}
+
+function addManual(){
+  var name=(document.getElementById('m-name').value||'').trim();
+  if(!name){document.getElementById('m-name').focus();return;}
+  var entry={
+    name:name,
+    brand:(document.getElementById('m-brand').value||'').trim(),
+    cal:parseInt(document.getElementById('m-cal').value)||0,
+    carbs:parseInt(document.getElementById('m-carbs').value)||0,
+    fiber:parseInt(document.getElementById('m-fiber').value)||0,
+    protein:parseInt(document.getElementById('m-protein').value)||0,
+    sodium:parseInt(document.getElementById('m-sodium').value)||0,
+    sugar:parseInt(document.getElementById('m-sugar').value)||0,
+    servingSize:1,servingUnit:'serving',manual:true
+  };
+  log[selMeal].push(entry);
+  addHist(entry);saveDay();renderAll();closeModal();
+}
+
+// ── Confirm & Add ─────────────────────────────────────────────────
+function htip(f){if(f.sugar>15)return'High in sugar ('+f.sugar+'g) — can raise triglycerides.';if(f.fiber>=4)return'Good fiber source ('+f.fiber+'g) — helps blood sugar and cholesterol.';if(f.carbs>40&&f.fiber<3)return'High refined carbs — moderate portions help keep triglycerides in check.';if(f.protein>=20)return'High protein — supports satiety and blood sugar stability.';if(f.sodium>600)return'High sodium ('+f.sodium+'mg) — watch your daily total.';return'';}
+function showConf(f,scanned){
+  var mb=cm2();aTitle(mb,'Confirm & Add','Adding to '+selMeal);aMTabs(mb);
+  if(scanned){var sb=document.createElement('div');sb.style.cssText='display:inline-flex;align-items:center;gap:5px;background:var(--gp);border:1px solid var(--gd);border-radius:16px;padding:3px 9px;font-size:11px;font-weight:700;color:var(--gd);margin-bottom:10px;';sb.textContent='📷 Scanned from barcode';mb.appendChild(sb);}
+  var tip=htip(f),card=document.createElement('div');card.className='cc';
+  card.innerHTML='<div class="cn">'+f.name+'</div>'+(f.brand?'<div class="cbr2">'+f.brand+'</div>':'')+'<div class="cm"><div class="cma"><div class="cmv">'+f.cal+'</div><div class="cml">Cal</div></div><div class="cma"><div class="cmv">'+f.carbs+'g</div><div class="cml">Carbs</div></div><div class="cma"><div class="cmv">'+f.fiber+'g</div><div class="cml">Fiber</div></div><div class="cma"><div class="cmv">'+f.protein+'g</div><div class="cml">Protein</div></div><div class="cma"><div class="cmv">'+f.sodium+'mg</div><div class="cml">Sodium</div></div></div>'+(tip?'<div class="ct">💡 '+tip+'</div>':'');
+  mb.appendChild(card);
+  var sr=document.createElement('div');sr.className='sv2';
+  var sl=document.createElement('label');sl.textContent='Servings:';
+  var si=document.createElement('input');si.type='number';si.id='svi';si.value='1';si.min='0.25';si.max='20';si.step='0.25';si.className='si2';
+  var su=document.createElement('span');su.className='su2';su.textContent='x '+(f.servingSize||1)+(f.servingUnit||'g');
+  sr.appendChild(sl);sr.appendChild(si);sr.appendChild(su);mb.appendChild(sr);
+  mb.appendChild(mkBtn('pri','✓ Add to '+selMeal,addFood));
+  mb.appendChild(mkBtn('sec','← Back',showMS));
+}
+
+function addFood(){
+  if(!selFood)return;
+  var si=document.getElementById('svi'),s=si?parseFloat(si.value)||1:1,f=selFood;
+  var entry={name:f.name,brand:f.brand||'',cal:Math.round(f.cal*s),carbs:Math.round(f.carbs*s),fiber:Math.round(f.fiber*s),protein:Math.round(f.protein*s),sodium:Math.round(f.sodium*s),sugar:Math.round((f.sugar||0)*s),scanned:f.scanned||false};
+  log[selMeal].push(entry);addHist(entry);saveDay();renderAll();closeModal();
+}
 function showLoad(msg){var mb=cm2();var t=document.createElement('div');t.style.cssText='font-family:Fraunces,serif;font-size:22px;color:var(--ac);margin-bottom:4px;';t.textContent='One moment...';mb.appendChild(t);var w=document.createElement('div');w.className='lw';w.innerHTML='<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div>'+msg+'</div>';mb.appendChild(w);}
+
+// ── Suggest ───────────────────────────────────────────────────────
 function setSit(s,el){sit=s;document.querySelectorAll('.si').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderSuggest();}
-function renderSuggest(){renderDS();var t=getTot(),nf=t.fiber<18,np=t.protein<100,hc=t.carbs>110,hs=t.sodium>1800,hr=new Date().getHours(),tEl=document.getElementById('sgtitle'),lEl=document.getElementById('sglist');lEl.innerHTML='';var cards,isR=false;if(sit==='home'){tEl.textContent=hr<11?'Breakfast Ideas':hr<15?'Lunch Ideas':'Dinner Ideas';cards=hIdeas(nf,np,hc,hs,hr);}else if(sit==='quick'){tEl.textContent='Quick Options';cards=qIdeas(nf,np,hc);}else if(sit==='out'){tEl.textContent='Eating Out Tonight';cards=rIdeas(nf,np,hc,hs);isR=true;}else{tEl.textContent='Smart Snacks';cards=sIdeas(nf,np,hc);}cards.forEach(function(c){lEl.appendChild(isR?mkRC(c):mkSC(c));});}
-function renderDS(){var t=getTot(),el=document.getElementById('ds');if(t.cal===0){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">Nothing logged yet today.</div>';return;}var gaps=[{i:'\ud83d\udd25',l:'Calories',v:Math.round(t.cal),g:2000,u:'',mn:false},{i:'\ud83c\udf5e',l:'Carbs',v:Math.round(t.carbs),g:130,u:'g',mn:false},{i:'\ud83c\udf3f',l:'Fiber',v:Math.round(t.fiber),g:28,u:'g',mn:true},{i:'\ud83d\udcaa',l:'Protein',v:Math.round(t.protein),g:150,u:'g',mn:true},{i:'\ud83e\uddc2',l:'Sodium',v:Math.round(t.sodium),g:2300,u:'mg',mn:false}];el.innerHTML=gaps.map(function(g){var p=(g.v/g.g)*100,badge,status;if(g.mn){if(p>=100){badge='good';status='Met';}else if(p>=60){badge='warn';status=Math.round(g.g-g.v)+g.u+' to go';}else{badge='bad';status=Math.round(g.g-g.v)+g.u+' needed';}}else{if(p<=75){badge='good';status=Math.round(g.g-g.v)+g.u+' left';}else if(p<=100){badge='warn';status=Math.round(g.g-g.v)+g.u+' left';}else{badge='bad';status='Over goal';}}return'<div class="dg"><div class="dgi">'+g.i+'</div><div class="dgt"><div class="dgl">'+g.l+'</div><div class="dgs">'+g.v+g.u+' of '+g.g+g.u+'</div></div><div class="dgb '+badge+'">'+status+'</div></div>';}).join('');}
+function renderSuggest(){renderDS();var t=getTot(),nf=t.fiber<18,np=t.protein<100,hc=t.carbs>110,hs=t.sodium>1800,hr=new Date().getHours(),tEl=document.getElementById('sgtitle'),lEl=document.getElementById('sglist');lEl.innerHTML='';var cards,isR=false;if(sit==='home'){tEl.textContent=hr<11?'Breakfast Ideas':hr<15?'Lunch Ideas':'Dinner Ideas';cards=hIdeas(nf,np,hc);}else if(sit==='quick'){tEl.textContent='Quick Options';cards=qIdeas(nf,np,hc);}else if(sit==='out'){tEl.textContent='Eating Out Tonight';cards=rIdeas(nf,np,hc,hs);isR=true;}else{tEl.textContent='Smart Snacks';cards=sIdeas(nf,np,hc);}cards.forEach(function(c){lEl.appendChild(isR?mkRC(c):mkSC(c));});}
+function renderDS(){var t=getTot(),el=document.getElementById('ds');if(t.cal===0){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">Nothing logged yet today.</div>';return;}var gaps=[{i:'🔥',l:'Calories',v:Math.round(t.cal),g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:Math.round(t.carbs),g:130,u:'g',mn:false},{i:'🌿',l:'Fiber',v:Math.round(t.fiber),g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:Math.round(t.protein),g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:Math.round(t.sodium),g:2300,u:'mg',mn:false}];el.innerHTML=gaps.map(function(g){var p=(g.v/g.g)*100,badge,status;if(g.mn){if(p>=100){badge='good';status='Met';}else if(p>=60){badge='warn';status=Math.round(g.g-g.v)+g.u+' to go';}else{badge='bad';status=Math.round(g.g-g.v)+g.u+' needed';}}else{if(p<=75){badge='good';status=Math.round(g.g-g.v)+g.u+' left';}else if(p<=100){badge='warn';status=Math.round(g.g-g.v)+g.u+' left';}else{badge='bad';status='Over goal';}}return'<div class="dg"><div class="dgi">'+g.i+'</div><div class="dgt"><div class="dgl">'+g.l+'</div><div class="dgs">'+g.v+g.u+' of '+g.g+g.u+'</div></div><div class="dgb '+badge+'">'+status+'</div></div>';}).join('');}
 function mkSC(s){var d=document.createElement('div');d.className='sgc';var top=document.createElement('div');top.className='sgt';var em=document.createElement('div');em.className='sge';em.textContent=s.e;var info=document.createElement('div');info.className='sgi';info.innerHTML='<div class="sgn">'+s.n+'</div><div class="sgw">'+s.w+'</div><div class="sgd">'+s.d+'</div>';top.appendChild(em);top.appendChild(info);d.appendChild(top);var ch=document.createElement('div');ch.className='sgch';ch.innerHTML=s.c.map(function(c){return'<span class="sc '+(c.t||'')+'">'+c.l+'</span>';}).join('');d.appendChild(ch);return d;}
-function mkRC(r){var d=document.createElement('div');d.className='rc';d.innerHTML='<div class="rcn">'+r.e+' '+r.n+'</div><div class="rct">'+r.t+'</div>';r.o.forEach(function(o){var row=document.createElement('div');row.className='rco';row.innerHTML='<div>\u2713</div><div class="rcot"><strong>'+o.i+'</strong><div class="rcop">'+o.t+'</div></div>';d.appendChild(row);});return d;}
-function hIdeas(nf,np,hc,hs,hr){return[{e:'\ud83d\udc1f',n:'Air Fryer Salmon + Green Beans',w:'Your go-to \u2014 perfect for your numbers',d:'Aldi salmon with garlic powder and cayenne, air fried. Side of green beans. High omega-3, low carb, done in 15 min.',c:[{l:'~400 cal'},{l:'omega-3s',t:'good'},{l:'~35g protein',t:'good'},{l:'low carbs',t:'good'}]},{e:'\ud83c\udf2e',n:'Taco Bowl',w:nf?'Add black beans to hit your fiber goal':'Balanced and satisfying',d:'Ground beef or chicken, brown rice, black beans, salsa. Skip the tortilla.',c:[{l:'~500 cal'},{l:'black beans=fiber',t:'good'},{l:'~35g protein',t:'good'},{l:hc?'watch the rice':'brown rice'}]},{e:'\ud83c\udf73',n:'Scrambled Eggs in Olive Oil',w:np?'Quick protein boost \u2014 you need it today':'Simple, clean, satisfying',d:'3 eggs in olive oil with garlic powder and cayenne. Whole grain toast. 5 minutes.',c:[{l:'~320 cal'},{l:'~20g protein',t:'good'},{l:'low carbs',t:'good'},{l:'HDL-friendly',t:'good'}]},{e:'\ud83c\udf57',n:'Rotisserie Chicken + Sweet Potato',w:'High protein, more fiber than mashed potatoes',d:'Grab a rotisserie chicken from Aldi. Microwave a sweet potato \u2014 more fiber than regular mashed.',c:[{l:'~480 cal'},{l:'~40g protein',t:'good'},{l:'more fiber',t:'good'},{l:'no prep'}]}];}
-function qIdeas(nf,np,hc){return[{e:'\ud83e\udd5c',n:'PB Sandwich + Almonds',w:'Your reliable lunch \u2014 done in 2 minutes',d:'Natural peanut butter on whole grain bread. Handful of Aldi almonds. Add a banana for fiber.',c:[{l:'~420 cal'},{l:'whole grain',t:'good'},{l:'healthy fats',t:'good'},{l:'2 min'}]},{e:'\ud83d\udc1f',n:'Air Fryer Salmon',w:'Fastest high-quality meal you can make',d:'Season Aldi salmon with garlic powder and cayenne, air fry 12 min at 400F.',c:[{l:'~280 cal'},{l:'omega-3s',t:'good'},{l:'~30g protein',t:'good'},{l:'12 min'}]},{e:'\ud83c\udf73',n:'3-Egg Scramble',w:np?'Fast protein \u2014 you need it today':'Fastest real meal possible',d:'Eggs in olive oil with garlic powder and cayenne. 5 minutes.',c:[{l:'~280 cal'},{l:'~20g protein',t:'good'},{l:'zero carbs',t:hc?'good':''},{l:'5 min'}]},{e:'\ud83e\udd57',n:'Rotisserie Chicken + Bag Salad',w:'Zero cooking, high protein',d:'Rotisserie chicken from Aldi with a pre-made bag salad, olive oil and lemon.',c:[{l:'~380 cal'},{l:'~38g protein',t:'good'},{l:nf?'salad adds fiber':'no cooking'},{l:'no cooking'}]}];}
-function sIdeas(nf,np,hc){return[{e:'\ud83c\udf30',n:'Aldi Southern Grove Almonds',w:'Your best default snack \u2014 always have these',d:'1oz handful. Healthy fats, 6g protein, 3g fiber. Way better than pretzels.',c:[{l:'170 cal'},{l:'6g protein',t:'good'},{l:'3g fiber',t:'good'},{l:'low sugar',t:'good'}]},{e:'\ud83c\udf6b',n:'Raw Crunch Bar',w:'5-star rated, certified organic \u2014 your best bar',d:'You already have these. Perfect snack \u2014 clean ingredients, great for your metabolic goals.',c:[{l:'5-star rated',t:'good'},{l:'certified organic',t:'good'},{l:'no additives',t:'good'}]},{e:'\ud83e\udd5c',n:'PB on Whole Grain',w:np?'Quick protein + keeps you full':'No sugar spike',d:'Natural peanut butter on one slice of whole grain bread.',c:[{l:'~200 cal'},{l:'~7g protein'},{l:'no sugar spike',t:'good'}]},{e:'\ud83e\udd5a',n:'Hard Boiled Eggs',w:'Best high-protein zero-carb snack',d:'Batch cook 6 on Sunday. Zero carbs, 12g protein. Sprinkle garlic powder on top.',c:[{l:'140 cal'},{l:'12g protein',t:'good'},{l:'0g carbs',t:hc?'good':''},{l:'batch ahead'}]}];}
-function rIdeas(nf,np,hc,hs){return[{e:'\ud83c\udf2f',n:'Chipotle',t:'Mexican \u2014 great if ordered right',o:[{i:'Chicken or Steak Bowl (no tortilla)',t:'Bowl over burrito cuts refined carbs.'},{i:'Brown rice + black beans',t:nf?'Black beans are your best fiber source here.':'Best fiber combo at fast food.'},{i:'Fajita veggies + salsa + guacamole',t:'Guac adds healthy fats. Skip sour cream.'},{i:'Skip: chips, queso, white rice',t:hc?'Carbs already high \u2014 skip chips entirely.':'Chips double your carb load fast.'}]},{e:'\ud83c\udf57',n:'Chick-fil-A',t:'Fast food \u2014 solid options if ordered right',o:[{i:'Grilled Chicken Sandwich or Grilled Nuggets',t:'Grilled over fried cuts 200+ calories.'},{i:'Side salad with light dressing',t:nf?'You need fiber \u2014 salad over waffle fries.':'Better than fries for your triglyceride goal.'},{i:'Skip: fried items, milkshakes, mac and cheese',t:hs?'Sodium already high \u2014 fried adds more.':'Fried options spike triglycerides.'}]},{e:'\ud83c\udf63',n:'Sushi Restaurant',t:'Japanese \u2014 one of the best options for you',o:[{i:'Sashimi \u2014 salmon, tuna, yellowtail',t:'Pure fish, no rice. Highest omega-3 meal at any restaurant.'},{i:'Edamame as appetizer',t:nf?'Edamame has 8g fiber per cup.':'High fiber, high protein, very low carb.'},{i:'Miso soup + seaweed salad',t:'Good additions. Watch sodium on miso.'},{i:'Limit rolls with white rice',t:hc?'Carbs already high \u2014 keep rolls to 1-2.':'White rice adds up fast.'}]},{e:'\ud83e\udd69',n:'Steakhouse or Casual Grill',t:'American \u2014 good choices available',o:[{i:'Grilled salmon, chicken, or sirloin',t:'Salmon at a restaurant is always a win.'},{i:'Steamed vegetables or salad instead of fries',t:nf?'Swapping fries for veg closes your fiber gap.':'This swap saves ~400 cal and 50g carbs.'},{i:'Skip: bread basket, creamy sauces, loaded potatoes',t:'Bread basket is pure refined carb \u2014 skip it.'}]},{e:'\ud83c\udf55',n:'Pizza',t:'Harder to optimize \u2014 here is how to minimize',o:[{i:'2 slices thin crust with protein toppings',t:'Thin crust cuts carbs vs regular.'},{i:'Side salad first',t:'Eating salad before pizza reduces how much you eat.'},{i:'Stop at 2 slices',t:hc?'Carbs already high \u2014 2 slices is your real limit.':'Pizza carbs stack up fast.'}]}];}
-function renderHistory(){var days=allDays(),el=document.getElementById('hl');el.innerHTML='';var valid=days.filter(function(d){return Object.values(d.data).some(function(arr){return arr.length>0;});});if(!valid.length){el.innerHTML='<div class="nh">No history yet. Start logging today!</div>';return;}valid.forEach(function(d,idx){var t=dTot(d.data),dl=new Date(d.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}),bid='hdb'+idx,aid='hda'+idx,outer=document.createElement('div');outer.className='hd';var hdr=document.createElement('div');hdr.className='hdh';hdr.innerHTML='<span class="hdd">'+dl+'</span><div style="display:flex;gap:10px;align-items:center;"><span class="hdc">'+Math.round(t.cal)+' cal</span><span class="hda" id="'+aid+'">\u25bc</span></div>';(function(b,a){hdr.onclick=function(){var bo=document.getElementById(b),ao=document.getElementById(a);if(bo)bo.classList.toggle('open');if(ao)ao.classList.toggle('open');};})(bid,aid);outer.appendChild(hdr);var body=document.createElement('div');body.className='hdb';body.id=bid;MEALS.forEach(function(meal){var items=d.data[meal]||[];if(!items.length)return;var lbl=document.createElement('div');lbl.className='hml';lbl.textContent=meal;body.appendChild(lbl);items.forEach(function(f){var row=document.createElement('div');row.className='hfr';row.innerHTML='<span class="hfn">'+f.name+'</span><span class="hfc">'+f.cal+' cal</span>';body.appendChild(row);});});var tot=document.createElement('div');tot.className='hto';tot.innerHTML='<span class="htc">\ud83c\udf5e '+Math.round(t.carbs)+'g carbs</span><span class="htc">\ud83c\udf3f '+Math.round(t.fiber)+'g fiber</span><span class="htc">\ud83d\udcaa '+Math.round(t.protein)+'g protein</span><span class="htc">\ud83e\uddc2 '+Math.round(t.sodium)+'mg</span>';body.appendChild(tot);outer.appendChild(body);el.appendChild(outer);});}
+function mkRC(r){var d=document.createElement('div');d.className='rc';d.innerHTML='<div class="rcn">'+r.e+' '+r.n+'</div><div class="rct">'+r.t+'</div>';r.o.forEach(function(o){var row=document.createElement('div');row.className='rco';row.innerHTML='<div>✓</div><div class="rcot"><strong>'+o.i+'</strong><div class="rcop">'+o.t+'</div></div>';d.appendChild(row);});return d;}
+function hIdeas(nf,np,hc){return[{e:'🐟',n:'Air Fryer Salmon + Green Beans',w:'Your go-to — perfect for your numbers',d:'Aldi salmon with garlic powder and cayenne, air fried. Side of green beans. High omega-3, low carb.',c:[{l:'~400 cal'},{l:'omega-3s',t:'good'},{l:'~35g protein',t:'good'},{l:'low carbs',t:'good'}]},{e:'🌮',n:'Taco Bowl',w:nf?'Add black beans to hit your fiber goal':'Balanced and satisfying',d:'Ground beef or chicken, brown rice, black beans, salsa. Skip the tortilla.',c:[{l:'~500 cal'},{l:'black beans=fiber',t:'good'},{l:'~35g protein',t:'good'},{l:hc?'watch the rice':'brown rice'}]},{e:'🍳',n:'Scrambled Eggs in Olive Oil',w:np?'Quick protein boost — you need it today':'Simple, clean, satisfying',d:'3 eggs in olive oil with garlic powder and cayenne. Whole grain toast. 5 minutes.',c:[{l:'~320 cal'},{l:'~20g protein',t:'good'},{l:'low carbs',t:'good'},{l:'HDL-friendly',t:'good'}]},{e:'🍗',n:'Rotisserie Chicken + Sweet Potato',w:'High protein, more fiber than mashed',d:'Grab a rotisserie chicken from Aldi. Microwave a sweet potato — more fiber than regular mashed.',c:[{l:'~480 cal'},{l:'~40g protein',t:'good'},{l:'more fiber',t:'good'},{l:'no prep'}]}];}
+function qIdeas(nf,np,hc){return[{e:'🥜',n:'PB Sandwich + Almonds',w:'Your reliable lunch — done in 2 minutes',d:'Natural peanut butter on whole grain bread. Handful of Aldi almonds. Add a banana for fiber.',c:[{l:'~420 cal'},{l:'whole grain',t:'good'},{l:'healthy fats',t:'good'},{l:'2 min'}]},{e:'🐟',n:'Air Fryer Salmon',w:'Fastest high-quality meal you can make',d:'Season Aldi salmon with garlic powder and cayenne, air fry 12 min at 400F.',c:[{l:'~280 cal'},{l:'omega-3s',t:'good'},{l:'~30g protein',t:'good'},{l:'12 min'}]},{e:'🍳',n:'3-Egg Scramble',w:np?'Fast protein — you need it today':'Fastest real meal possible',d:'Eggs in olive oil with garlic powder and cayenne. 5 minutes.',c:[{l:'~280 cal'},{l:'~20g protein',t:'good'},{l:'zero carbs',t:hc?'good':''},{l:'5 min'}]},{e:'🥗',n:'Rotisserie Chicken + Bag Salad',w:'Zero cooking, high protein',d:'Rotisserie chicken from Aldi with a pre-made bag salad, olive oil and lemon.',c:[{l:'~380 cal'},{l:'~38g protein',t:'good'},{l:nf?'salad adds fiber':'no cooking'},{l:'no cooking'}]}];}
+function sIdeas(nf,np,hc){return[{e:'🌰',n:'Aldi Southern Grove Almonds',w:'Your best default snack — always have these',d:'1oz handful. Healthy fats, 6g protein, 3g fiber. Way better than pretzels.',c:[{l:'170 cal'},{l:'6g protein',t:'good'},{l:'3g fiber',t:'good'},{l:'low sugar',t:'good'}]},{e:'🍫',n:'Raw Crunch Bar',w:'5-star rated, certified organic — your best bar',d:'You already have these. Perfect snack — clean ingredients, great for your metabolic goals.',c:[{l:'5-star rated',t:'good'},{l:'certified organic',t:'good'},{l:'no additives',t:'good'}]},{e:'🥜',n:'PB on Whole Grain',w:np?'Quick protein + keeps you full':'No sugar spike',d:'Natural peanut butter on one slice of whole grain bread.',c:[{l:'~200 cal'},{l:'~7g protein'},{l:'no sugar spike',t:'good'}]},{e:'🥚',n:'Hard Boiled Eggs',w:'Best high-protein zero-carb snack',d:'Batch cook 6 on Sunday. Zero carbs, 12g protein.',c:[{l:'140 cal'},{l:'12g protein',t:'good'},{l:'0g carbs',t:hc?'good':''},{l:'batch ahead'}]}];}
+function rIdeas(nf,np,hc,hs){return[{e:'🌯',n:'Chipotle',t:'Mexican — great if ordered right',o:[{i:'Chicken or Steak Bowl (no tortilla)',t:'Bowl over burrito cuts refined carbs.'},{i:'Brown rice + black beans',t:nf?'Black beans are your best fiber source here.':'Best fiber combo at fast food.'},{i:'Fajita veggies + salsa + guacamole',t:'Guac adds healthy fats.'},{i:'Skip: chips, queso, white rice',t:hc?'Carbs already high — skip chips entirely.':'Chips double your carb load fast.'}]},{e:'🍗',n:'Chick-fil-A',t:'Fast food — solid options if ordered right',o:[{i:'Grilled Chicken Sandwich or Grilled Nuggets',t:'Grilled over fried cuts 200+ calories.'},{i:'Side salad with light dressing',t:nf?'You need fiber — salad over waffle fries.':'Better than fries for your triglyceride goal.'},{i:'Skip: fried items, milkshakes, mac and cheese',t:'Fried options spike triglycerides.'}]},{e:'🍣',n:'Sushi Restaurant',t:'Japanese — one of the best options for you',o:[{i:'Sashimi — salmon, tuna, yellowtail',t:'Pure fish, no rice. Highest omega-3 meal.'},{i:'Edamame as appetizer',t:nf?'Edamame has 8g fiber per cup.':'High fiber, high protein, very low carb.'},{i:'Miso soup + seaweed salad',t:'Good additions.'},{i:'Limit rolls with white rice',t:hc?'Carbs already high — keep rolls to 1-2.':'White rice adds up fast.'}]},{e:'🥩',n:'Steakhouse or Casual Grill',t:'American — good choices available',o:[{i:'Grilled salmon, chicken, or sirloin',t:'Salmon at a restaurant is always a win.'},{i:'Steamed vegetables or salad instead of fries',t:nf?'Swapping fries for veg closes your fiber gap.':'This swap saves ~400 cal and 50g carbs.'},{i:'Skip: bread basket, creamy sauces, loaded potatoes',t:'Bread basket is pure refined carb — skip it.'}]},{e:'🍕',n:'Pizza',t:'Harder to optimize — here is how to minimize',o:[{i:'2 slices thin crust with protein toppings',t:'Thin crust cuts carbs vs regular.'},{i:'Side salad first',t:'Eating salad before pizza reduces how much you eat.'},{i:'Stop at 2 slices',t:hc?'Carbs already high — 2 slices is your real limit.':'Pizza carbs stack up fast.'}]}];}
+
+// ── History ────────────────────────────────────────────────────────
+function renderHistory(){var days=allDays(),el=document.getElementById('hist-list');el.innerHTML='';var valid=days.filter(function(d){return Object.values(d.data).some(function(arr){return arr.length>0;});});if(!valid.length){el.innerHTML='<div class="nh">No history yet. Start logging today!</div>';return;}valid.forEach(function(d,idx){var t=dTot(d.data),dl=new Date(d.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}),bid='hdb'+idx,aid='hda'+idx,outer=document.createElement('div');outer.className='hd';var hdr=document.createElement('div');hdr.className='hdh';hdr.innerHTML='<span class="hdd">'+dl+'</span><div style="display:flex;gap:10px;align-items:center;"><span class="hdc">'+Math.round(t.cal)+' cal</span><span class="hda" id="'+aid+'">▼</span></div>';(function(b,a){hdr.onclick=function(){var bo=document.getElementById(b),ao=document.getElementById(a);if(bo)bo.classList.toggle('open');if(ao)ao.classList.toggle('open');};})(bid,aid);outer.appendChild(hdr);var body=document.createElement('div');body.className='hdb';body.id=bid;MEALS.forEach(function(meal){var items=d.data[meal]||[];if(!items.length)return;var lbl=document.createElement('div');lbl.className='hml';lbl.textContent=meal;body.appendChild(lbl);items.forEach(function(f){var row=document.createElement('div');row.className='hfr';row.innerHTML='<span class="hfn">'+f.name+'</span><span class="hfc">'+f.cal+' cal</span>';body.appendChild(row);});});var tot=document.createElement('div');tot.className='hto';tot.innerHTML='<span class="htc">🍞 '+Math.round(t.carbs)+'g</span><span class="htc">🌿 '+Math.round(t.fiber)+'g fiber</span><span class="htc">💪 '+Math.round(t.protein)+'g</span><span class="htc">🧂 '+Math.round(t.sodium)+'mg</span>';body.appendChild(tot);outer.appendChild(body);el.appendChild(outer);});}
+
+// ── Trends ─────────────────────────────────────────────────────────
 function setTP(n,el){tDays=n;document.querySelectorAll('.sta').forEach(function(t){t.classList.remove('active');});el.classList.add('active');renderTrends();}
-function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'\ud83d\udd25',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'\ud83c\udf5e',l:'Carbs',v:avg.carbs,g:130,u:'g',mn:false},{i:'\ud83c\udf3f',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'\ud83d\udcaa',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'\ud83e\uddc2',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=130;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49','4\ufe0f\u20e3','5\ufe0f\u20e3'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse(),mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data).cal;}).concat([2000]));document.getElementById('tc').innerHTML=cd.map(function(d){var tc=dTot(d.data).cal,p=Math.round((tc/mx)*100),cls=tc>2000?'o':(tc>1700?'w':''),lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});return'<div class="cbr2"><div class="cbd">'+lb+'</div><div class="cbw"><div class="cbf'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="cbv">'+Math.round(tc)+'</div></div>';}).join('');}
+function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'🔥',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:avg.carbs,g:130,u:'g',mn:false},{i:'🌿',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=130;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd2 '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['🥇','🥈','🥉','4️⃣','5️⃣'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse(),mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data).cal;}).concat([2000]));document.getElementById('tc').innerHTML=cd.map(function(d){var tc=dTot(d.data).cal,p=Math.round((tc/mx)*100),cls=tc>2000?'o':(tc>1700?'w':''),lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});return'<div class="cbr3"><div class="cbd">'+lb+'</div><div class="cbw"><div class="cbf'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="cbv">'+Math.round(tc)+'</div></div>';}).join('');}
 </script>
 </body>
 </html>
