@@ -78,7 +78,7 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .mts{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
 .mt{padding:7px 14px;border-radius:18px;border:2px solid var(--bd);background:var(--sf2);color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s;}
 .mt.active{background:var(--ac);border-color:var(--ac);color:#fff;}
-.mgr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.mgr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}.mgr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
 .mbt{background:var(--sf2);border:2px solid var(--bd);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
 .mbt:hover{border-color:var(--al);background:var(--ap);}
 .mi{font-size:24px;margin-bottom:5px;}
@@ -249,7 +249,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
 <div class="page active" id="page-log">
   <div class="sr">
     <div class="sb"><div class="sv" id="sv-cal">0</div><div class="sl">Cal</div><div class="ss">/2000</div><div class="sba"><div class="sbf" id="sb-cal" style="width:0%"></div></div></div>
-    <div class="sb"><div class="sv" id="sv-carbs">0g</div><div class="sl">Carbs</div><div class="ss">/130g</div><div class="sba"><div class="sbf" id="sb-carbs" style="width:0%"></div></div></div>
+    <div class="sb"><div class="sv" id="sv-carbs">0g</div><div class="sl">Carbs</div><div class="ss">/175g</div><div class="sba"><div class="sbf" id="sb-carbs" style="width:0%"></div></div></div>
     <div class="sb"><div class="sv" id="sv-fiber">0g</div><div class="sl">Fiber</div><div class="ss">/28g</div><div class="sba"><div class="sbf" id="sb-fiber" style="width:0%"></div></div></div>
     <div class="sb"><div class="sv" id="sv-protein">0g</div><div class="sl">Protein</div><div class="ss">/150g</div><div class="sba"><div class="sbf" id="sb-protein" style="width:0%"></div></div></div>
     <div class="sb"><div class="sv" id="sv-sodium">0mg</div><div class="sl">Sodium</div><div class="ss">/2300</div><div class="sba"><div class="sbf" id="sb-sodium" style="width:0%"></div></div></div>
@@ -257,7 +257,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
   <div class="sec">
     <div class="sh2"><span class="st">Daily Progress</span><button class="cb" onclick="clearDay()">Clear Day</button></div>
     <div class="gr"><span class="gl">Calories</span><div class="gt"><div class="gf" id="gf-cal" style="width:0%"></div></div><span class="gn" id="gn-cal">0 / 2000</span></div>
-    <div class="gr"><span class="gl">Carbs</span><div class="gt"><div class="gf" id="gf-carbs" style="width:0%"></div></div><span class="gn" id="gn-carbs">0 / 130g</span></div>
+    <div class="gr"><span class="gl">Carbs</span><div class="gt"><div class="gf" id="gf-carbs" style="width:0%"></div></div><span class="gn" id="gn-carbs">0 / 175g</span></div>
     <div class="gr"><span class="gl">Fiber</span><div class="gt"><div class="gf" id="gf-fiber" style="width:0%"></div></div><span class="gn" id="gn-fiber">0 / 28g</span></div>
     <div class="gr"><span class="gl">Protein</span><div class="gt"><div class="gf" id="gf-protein" style="width:0%"></div></div><span class="gn" id="gn-protein">0 / 150g</span></div>
     <div class="gr"><span class="gl">Sodium</span><div class="gt"><div class="gf" id="gf-sodium" style="width:0%"></div></div><span class="gn" id="gn-sodium">0 / 2300mg</span></div>
@@ -410,7 +410,7 @@ function getTot(){return[].concat(log.Breakfast,log.Lunch,log.Dinner,log.Snack).
 function bc(v,g,mn){var p=(v/g)*100;if(mn)return p>=70?'':(p>=40?'w':'o');return p>100?'o':(p>85?'w':'');}
 function renderAll(){
   var t=getTot();
-  var cfg={cal:{g:2000,u:'',mn:false},carbs:{g:130,u:'g',mn:false},fiber:{g:28,u:'g',mn:true},protein:{g:150,u:'g',mn:true},sodium:{g:2300,u:'mg',mn:false}};
+  var cfg={cal:{g:2000,u:'',mn:false},carbs:{g:175,u:'g',mn:false},fiber:{g:28,u:'g',mn:true},protein:{g:150,u:'g',mn:true},sodium:{g:2300,u:'mg',mn:false}};
   Object.keys(cfg).forEach(function(k){
     var c=cfg[k],v=Math.round(t[k]);
     document.getElementById('sv-'+k).textContent=v+c.u;
@@ -421,7 +421,7 @@ function renderAll(){
   });
   var pf=document.getElementById('pfw');
   if(t.cal===0){pf.innerHTML='<div class="pc pend">Log a meal to see status</div>';}
-  else{pf.innerHTML=[{l:'Calories',f:t.cal>2000},{l:'Carbs',f:t.carbs>130},{l:'Fiber',p:t.fiber<20},{l:'Protein',p:t.protein<100},{l:'Sodium',f:t.sodium>2300}].map(function(c){return c.f?'<div class="pc fail">✗ '+c.l+'</div>':c.p?'<div class="pc prog">→ '+c.l+'</div>':'<div class="pc pass">✓ '+c.l+'</div>';}).join('');}
+  else{pf.innerHTML=[{l:'Calories',f:t.cal>2000},{l:'Carbs',f:t.carbs>175},{l:'Fiber',p:t.fiber<20},{l:'Protein',p:t.protein<100},{l:'Sodium',f:t.sodium>2300}].map(function(c){return c.f?'<div class="pc fail">✗ '+c.l+'</div>':c.p?'<div class="pc prog">→ '+c.l+'</div>':'<div class="pc pass">✓ '+c.l+'</div>';}).join('');}
   var mc=document.getElementById('mc');mc.innerHTML='';
   MEALS.forEach(function(meal){
     var items=log[meal]||[],mcal=items.reduce(function(a,f){return a+(f.cal||0);},0);
@@ -460,8 +460,8 @@ function showMS(){
   var mb=cm2();
   aTitle(mb,'Log Food','Choose how to add your meal');
   aMTabs(mb);
-  var gr=document.createElement('div');gr.className='mgr';
-  [{i:'🔍',l:'Search',fn:showSearch},{i:'⏰',l:'Recent & Favs',fn:function(){showFH('aldi');}},{i:'📷',l:'Scan Barcode',fn:showBC},{i:'✏️',l:'Enter Manually',fn:showManual}].forEach(function(item){
+  var gr=document.createElement('div');gr.className='mgr3';
+  [{i:'⏰',l:'Recent & Favs',fn:function(){showFH('aldi');}},{i:'✏️',l:'Enter Manually',fn:showManual},{i:'⭐',l:'Favorites',fn:function(){showFH('favs');}}].forEach(function(item){
     var btn=document.createElement('div');btn.className='mbt';
     btn.innerHTML='<div class="mi">'+item.i+'</div><div class="mlb">'+item.l+'</div>';
     btn.onclick=item.fn;gr.appendChild(btn);
@@ -612,7 +612,7 @@ var ALDI_STAPLES = [
 function showFH(tab){
   var hist=getHist(),favs=getFavs();
   var isAldi=tab==='aldi';
-  var items=isAldi?ALDI_STAPLES:(tab==='favs'?Object.values(favs):Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);}));
+  var histArr=Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);});var items=isAldi?ALDI_STAPLES:(tab==='favs'?Object.values(favs):histArr);
   var mb=cm2();aTitle(mb,isAldi?'My Aldi Staples':tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);
   var tabs=document.createElement('div');tabs.className='stb';
   var r=document.createElement('button');r.className='sta'+(tab==='recent'?' active':'');r.textContent='⏰ Recent';r.onclick=function(){showFH('recent');};
@@ -879,14 +879,14 @@ function showLoad(msg){var mb=cm2();var t=document.createElement('div');t.style.
 
 // ── Suggest ───────────────────────────────────────────────────────
 function setSit(s,el){sit=s;document.querySelectorAll('.si').forEach(function(b){b.classList.remove('active');});el.classList.add('active');renderSuggest();}
-function renderSuggest(){renderDS();renderLiveAdvice();var t=getTot(),nf=t.fiber<18,np=t.protein<100,hc=t.carbs>110,hs=t.sodium>1800,hr=new Date().getHours(),tEl=document.getElementById('sgtitle'),lEl=document.getElementById('sglist');lEl.innerHTML='';var cards,isR=false;if(sit==='home'){tEl.textContent=hr<11?'Breakfast Ideas':hr<15?'Lunch Ideas':'Dinner Ideas';cards=hIdeas(nf,np,hc);}else if(sit==='quick'){tEl.textContent='Quick Options';cards=qIdeas(nf,np,hc);}else if(sit==='out'){tEl.textContent='Eating Out Tonight';cards=rIdeas(nf,np,hc,hs);isR=true;}else{tEl.textContent='Smart Snacks';cards=sIdeas(nf,np,hc);}cards.forEach(function(c){lEl.appendChild(isR?mkRC(c):mkSC(c));});}
+function renderSuggest(){renderDS();renderLiveAdvice();var t=getTot(),nf=t.fiber<18,np=t.protein<100,hc=t.carbs>155,hs=t.sodium>1800,hr=new Date().getHours(),tEl=document.getElementById('sgtitle'),lEl=document.getElementById('sglist');lEl.innerHTML='';var cards,isR=false;if(sit==='home'){tEl.textContent=hr<11?'Breakfast Ideas':hr<15?'Lunch Ideas':'Dinner Ideas';cards=hIdeas(nf,np,hc);}else if(sit==='quick'){tEl.textContent='Quick Options';cards=qIdeas(nf,np,hc);}else if(sit==='out'){tEl.textContent='Eating Out Tonight';cards=rIdeas(nf,np,hc,hs);isR=true;}else{tEl.textContent='Smart Snacks';cards=sIdeas(nf,np,hc);}cards.forEach(function(c){lEl.appendChild(isR?mkRC(c):mkSC(c));});}
 
 function renderLiveAdvice(){
   // All advice grounded in ACC/AHA lipid guidelines, ADA prediabetes standards,
   // USDA Dietary Guidelines, and AHA sodium recommendations.
   var el=document.getElementById('live-advice');if(!el)return;
   var t=getTot(),hr=new Date().getHours(),messages=[];
-  var calLeft=2000-t.cal,carbsLeft=130-t.carbs,fiberLeft=28-t.fiber,protLeft=150-t.protein;
+  var calLeft=2000-t.cal,carbsLeft=175-t.carbs,fiberLeft=28-t.fiber,protLeft=150-t.protein;
 
   if(t.cal===0){
     messages.push({icon:'☀️',text:'Nothing logged yet. Regular meals help stabilize blood sugar — important for managing your A1C of 5.7 (ADA prediabetes guidelines).',type:'info'});
@@ -904,10 +904,10 @@ function renderLiveAdvice(){
     }
 
     // ── Carbohydrates (ADA + ACC/AHA for triglycerides) ───────────
-    if(t.carbs>130){
-      messages.push({icon:'🍞',text:'Carbs are '+Math.round(t.carbs-130)+'g over your 130g limit. Excess refined carbohydrates directly raise triglycerides and worsen insulin resistance — your two primary metabolic concerns (ACC/AHA, ADA).',type:'bad'});
-    } else if(t.carbs>110){
-      messages.push({icon:'🍞',text:'Only '+Math.round(carbsLeft)+'g of carbs remaining. Your 130g limit is set to help lower triglycerides (currently borderline at 199) per ACC/AHA guidelines. Avoid bread, rice, or starchy sides at dinner.',type:'warn'});
+    if(t.carbs>175){
+      messages.push({icon:'🍞',text:'Carbs are '+Math.round(t.carbs-130)+'g over your 175g limit. Excess refined carbohydrates directly raise triglycerides and worsen insulin resistance — your two primary metabolic concerns (ACC/AHA, ADA).',type:'bad'});
+    } else if(t.carbs>155){
+      messages.push({icon:'🍞',text:'Only '+Math.round(carbsLeft)+'g of carbs remaining. Your 175g limit is set to help lower triglycerides (currently borderline at 199) per ACC/AHA guidelines. Avoid bread, rice, or starchy sides at dinner.',type:'warn'});
     } else if(t.carbs<=80&&hr>17){
       messages.push({icon:'🍞',text:'Carbs are well-managed at '+Math.round(t.carbs)+'g. Keeping carbs moderate is one of the most evidence-backed strategies for reducing triglycerides (ACC/AHA).',type:'good'});
     }
@@ -970,7 +970,7 @@ function renderLiveAdvice(){
   });
 }
 
-function renderDS(){var t=getTot(),el=document.getElementById('ds');if(t.cal===0){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">Nothing logged yet today.</div>';return;}var gaps=[{i:'🔥',l:'Calories',v:Math.round(t.cal),g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:Math.round(t.carbs),g:130,u:'g',mn:false},{i:'🌿',l:'Fiber',v:Math.round(t.fiber),g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:Math.round(t.protein),g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:Math.round(t.sodium),g:2300,u:'mg',mn:false}];el.innerHTML=gaps.map(function(g){var p=(g.v/g.g)*100,badge,status;if(g.mn){if(p>=100){badge='good';status='Met';}else if(p>=60){badge='warn';status=Math.round(g.g-g.v)+g.u+' to go';}else{badge='bad';status=Math.round(g.g-g.v)+g.u+' needed';}}else{if(p<=75){badge='good';status=Math.round(g.g-g.v)+g.u+' left';}else if(p<=100){badge='warn';status=Math.round(g.g-g.v)+g.u+' left';}else{badge='bad';status='Over goal';}}return'<div class="dg"><div class="dgi">'+g.i+'</div><div class="dgt"><div class="dgl">'+g.l+'</div><div class="dgs">'+g.v+g.u+' of '+g.g+g.u+'</div></div><div class="dgb '+badge+'">'+status+'</div></div>';}).join('');}
+function renderDS(){var t=getTot(),el=document.getElementById('ds');if(t.cal===0){el.innerHTML='<div style="font-size:12px;color:var(--t3);font-style:italic;">Nothing logged yet today.</div>';return;}var gaps=[{i:'🔥',l:'Calories',v:Math.round(t.cal),g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:Math.round(t.carbs),g:175,u:'g',mn:false},{i:'🌿',l:'Fiber',v:Math.round(t.fiber),g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:Math.round(t.protein),g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:Math.round(t.sodium),g:2300,u:'mg',mn:false}];el.innerHTML=gaps.map(function(g){var p=(g.v/g.g)*100,badge,status;if(g.mn){if(p>=100){badge='good';status='Met';}else if(p>=60){badge='warn';status=Math.round(g.g-g.v)+g.u+' to go';}else{badge='bad';status=Math.round(g.g-g.v)+g.u+' needed';}}else{if(p<=75){badge='good';status=Math.round(g.g-g.v)+g.u+' left';}else if(p<=100){badge='warn';status=Math.round(g.g-g.v)+g.u+' left';}else{badge='bad';status='Over goal';}}return'<div class="dg"><div class="dgi">'+g.i+'</div><div class="dgt"><div class="dgl">'+g.l+'</div><div class="dgs">'+g.v+g.u+' of '+g.g+g.u+'</div></div><div class="dgb '+badge+'">'+status+'</div></div>';}).join('');}
 function mkSC(s){var d=document.createElement('div');d.className='sgc';var top=document.createElement('div');top.className='sgt';var em=document.createElement('div');em.className='sge';em.textContent=s.e;var info=document.createElement('div');info.className='sgi';info.innerHTML='<div class="sgn">'+s.n+'</div><div class="sgw">'+s.w+'</div><div class="sgd">'+s.d+'</div>';top.appendChild(em);top.appendChild(info);d.appendChild(top);var ch=document.createElement('div');ch.className='sgch';ch.innerHTML=s.c.map(function(c){return'<span class="sc '+(c.t||'')+'">'+c.l+'</span>';}).join('');d.appendChild(ch);return d;}
 function mkRC(r){var d=document.createElement('div');d.className='rc';d.innerHTML='<div class="rcn">'+r.e+' '+r.n+'</div><div class="rct">'+r.t+'</div>';r.o.forEach(function(o){var row=document.createElement('div');row.className='rco';row.innerHTML='<div>✓</div><div class="rcot"><strong>'+o.i+'</strong><div class="rcop">'+o.t+'</div></div>';d.appendChild(row);});return d;}
 function hIdeas(nf,np,hc){return[{e:'🐟',n:'Air Fryer Salmon + Green Beans',w:'Your go-to — perfect for your numbers',d:'Aldi salmon with garlic powder and cayenne, air fried. Side of green beans. High omega-3, low carb.',c:[{l:'~400 cal'},{l:'omega-3s',t:'good'},{l:'~35g protein',t:'good'},{l:'low carbs',t:'good'}]},{e:'🌮',n:'Taco Bowl',w:nf?'Add black beans to hit your fiber goal':'Balanced and satisfying',d:'Ground beef or chicken, brown rice, black beans, salsa. Skip the tortilla.',c:[{l:'~500 cal'},{l:'black beans=fiber',t:'good'},{l:'~35g protein',t:'good'},{l:hc?'watch the rice':'brown rice'}]},{e:'🍳',n:'Scrambled Eggs in Olive Oil',w:np?'Quick protein boost — you need it today':'Simple, clean, satisfying',d:'3 eggs in olive oil with garlic powder and cayenne. Whole grain toast. 5 minutes.',c:[{l:'~320 cal'},{l:'~20g protein',t:'good'},{l:'low carbs',t:'good'},{l:'HDL-friendly',t:'good'}]},{e:'🍗',n:'Rotisserie Chicken + Sweet Potato',w:'High protein, more fiber than mashed',d:'Grab a rotisserie chicken from Aldi. Microwave a sweet potato — more fiber than regular mashed.',c:[{l:'~480 cal'},{l:'~40g protein',t:'good'},{l:'more fiber',t:'good'},{l:'no prep'}]}];}
@@ -983,7 +983,7 @@ function renderHistory(){var days=allDays(),el=document.getElementById('hist-lis
 
 // ── Trends ─────────────────────────────────────────────────────────
 function setTP(n,el){tDays=n;document.querySelectorAll('.sta').forEach(function(t){t.classList.remove('active');});el.classList.add('active');renderTrends();}
-function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'🔥',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:avg.carbs,g:130,u:'g',mn:false},{i:'🌿',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=130;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd2 '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['🥇','🥈','🥉','4️⃣','5️⃣'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse(),mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data).cal;}).concat([2000]));document.getElementById('tc').innerHTML=cd.map(function(d){var tc=dTot(d.data).cal,p=Math.round((tc/mx)*100),cls=tc>2000?'o':(tc>1700?'w':''),lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});return'<div class="cbr3"><div class="cbd">'+lb+'</div><div class="cbw"><div class="cbf'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="cbv">'+Math.round(tc)+'</div></div>';}).join('');}
+function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'🔥',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:avg.carbs,g:175,u:'g',mn:false},{i:'🌿',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=175;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd2 '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['🥇','🥈','🥉','4️⃣','5️⃣'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse(),mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data).cal;}).concat([2000]));document.getElementById('tc').innerHTML=cd.map(function(d){var tc=dTot(d.data).cal,p=Math.round((tc/mx)*100),cls=tc>2000?'o':(tc>1700?'w':''),lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});return'<div class="cbr3"><div class="cbd">'+lb+'</div><div class="cbw"><div class="cbf'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="cbv">'+Math.round(tc)+'</div></div>';}).join('');}
 </script>
 </body>
 </html>
