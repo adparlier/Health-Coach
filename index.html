@@ -20,7 +20,7 @@ header{background:#0a1f3d;padding:16px 20px 0;position:sticky;top:0;z-index:100;
 .nt{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;font-family:'Nunito',sans-serif;background:none;border-top:none;border-left:none;border-right:none;}
 .nt.active{color:#fff;border-bottom-color:#4B9CD3;}
 .page{display:none;}.page.active{display:block;}
-.sr{display:grid;grid-template-columns:repeat(5,1fr);background:#0a1f3d;}
+.sr{display:grid;grid-template-columns:repeat(6,1fr);background:#0a1f3d;}
 .sb{padding:10px 4px 12px;text-align:center;border-right:1px solid rgba(75,156,211,0.25);position:relative;}
 .sb:last-child{border-right:none;}
 .sv{font-size:13px;font-weight:700;color:#fff;line-height:1;margin-bottom:2px;}
@@ -253,6 +253,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
     <div class="sb"><div class="sv" id="sv-fiber">0g</div><div class="sl">Fiber</div><div class="ss">/28g</div><div class="sba"><div class="sbf" id="sb-fiber" style="width:0%"></div></div></div>
     <div class="sb"><div class="sv" id="sv-protein">0g</div><div class="sl">Protein</div><div class="ss">/150g</div><div class="sba"><div class="sbf" id="sb-protein" style="width:0%"></div></div></div>
     <div class="sb"><div class="sv" id="sv-sodium">0mg</div><div class="sl">Sodium</div><div class="ss">/2300</div><div class="sba"><div class="sbf" id="sb-sodium" style="width:0%"></div></div></div>
+    <div class="sb"><div class="sv" id="sv-sugar">0g</div><div class="sl">Sugar</div><div class="ss">added</div><div class="sba"><div class="sbf" id="sb-sugar" style="width:0%"></div></div></div>
   </div>
   <div class="sec">
     <div class="sh2"><span class="st">Daily Progress</span><button class="cb" onclick="clearDay()">Clear Day</button></div>
@@ -261,6 +262,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
     <div class="gr"><span class="gl">Fiber</span><div class="gt"><div class="gf" id="gf-fiber" style="width:0%"></div></div><span class="gn" id="gn-fiber">0 / 28g</span></div>
     <div class="gr"><span class="gl">Protein</span><div class="gt"><div class="gf" id="gf-protein" style="width:0%"></div></div><span class="gn" id="gn-protein">0 / 150g</span></div>
     <div class="gr"><span class="gl">Sodium</span><div class="gt"><div class="gf" id="gf-sodium" style="width:0%"></div></div><span class="gn" id="gn-sodium">0 / 2300mg</span></div>
+    <div class="gr"><span class="gl">Added Sugar</span><div class="gt"><div class="gf" id="gf-sugar" style="width:0%"></div></div><span class="gn" id="gn-sugar">0 / 36g</span></div>
   </div>
   <div class="sec"><div class="sh2"><span class="st">Status</span></div><div class="pw" id="pfw"><div class="pc pend">Log a meal to see status</div></div></div>
   <div class="sec" style="margin-bottom:80px;"><div class="sh2"><span class="st">Today's Meals</span><button class="cb" onclick="showDatePicker()">+ Past Day</button></div><div id="mc"></div></div>
@@ -300,7 +302,12 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
     <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Daily Averages</span></div><div id="ta"></div></div>
     <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Goal Hit Rate</span></div><div id="tg"></div></div>
     <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Most Logged Foods</span></div><div id="tf"></div></div>
-    <div class="sec" style="margin:0 0 80px;"><div class="sh2"><span class="st">Calorie History</span></div><div id="tc"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Calorie History</span></div><div id="tc"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Carb History</span></div><div id="tcarb"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Fiber History</span></div><div id="tfib"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Protein History</span></div><div id="tprot"></div></div>
+    <div class="sec" style="margin:0 0 10px;"><div class="sh2"><span class="st">Sodium History</span></div><div id="tsod"></div></div>
+    <div class="sec" style="margin:0 0 80px;"><div class="sh2"><span class="st">Added Sugar History</span></div><div id="tsug"></div></div>
   </div>
 </div>
 
@@ -407,18 +414,18 @@ loadFavsFromCloud(function(){loadHistFromCloud(function(){loadDay();renderAll();
 function showPage(n,btn){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('active');});document.getElementById('page-'+n).classList.add('active');btn.classList.add('active');document.getElementById('fab').className=n==='log'?'fab':'fab hid';if(n==='suggest')renderSuggest();if(n==='history')renderHistory();if(n==='trends')renderTrends();}
 
 // ── Render today ─────────────────────────────────────────────────
-function getTot(){return[].concat(log.Breakfast,log.Lunch,log.Dinner,log.Snack).reduce(function(a,f){return{cal:a.cal+(f.cal||0),carbs:a.carbs+(f.carbs||0),fiber:a.fiber+(f.fiber||0),protein:a.protein+(f.protein||0),sodium:a.sodium+(f.sodium||0)};},{cal:0,carbs:0,fiber:0,protein:0,sodium:0});}
+function getTot(){return[].concat(log.Breakfast,log.Lunch,log.Dinner,log.Snack).reduce(function(a,f){return{cal:a.cal+(f.cal||0),carbs:a.carbs+(f.carbs||0),fiber:a.fiber+(f.fiber||0),protein:a.protein+(f.protein||0),sodium:a.sodium+(f.sodium||0),sugar:a.sugar+(f.sugar||0)};},{cal:0,carbs:0,fiber:0,protein:0,sodium:0,sugar:0});}
 function bc(v,g,mn){var p=(v/g)*100;if(mn)return p>=70?'':(p>=40?'w':'o');return p>100?'o':(p>85?'w':'');}
 function renderAll(){
   var t=getTot();
-  var cfg={cal:{g:2000,u:'',mn:false},carbs:{g:175,u:'g',mn:false},fiber:{g:28,u:'g',mn:true},protein:{g:150,u:'g',mn:true},sodium:{g:2300,u:'mg',mn:false}};
+  var cfg={cal:{g:2000,u:'',mn:false},carbs:{g:175,u:'g',mn:false},fiber:{g:28,u:'g',mn:true},protein:{g:150,u:'g',mn:true},sodium:{g:2300,u:'mg',mn:false},sugar:{g:36,u:'g',mn:false}};
   Object.keys(cfg).forEach(function(k){
     var c=cfg[k],v=Math.round(t[k]);
     document.getElementById('sv-'+k).textContent=v+c.u;
     var p=Math.min((t[k]/c.g)*100,100),cls=bc(t[k],c.g,c.mn);
     document.getElementById('sb-'+k).style.width=p+'%';document.getElementById('sb-'+k).className='sbf'+(cls?' '+cls:'');
     document.getElementById('gf-'+k).style.width=p+'%';document.getElementById('gf-'+k).className='gf'+(cls?' '+cls:'');
-    document.getElementById('gn-'+k).textContent=k==='cal'?v+' / 2000':k==='sodium'?v+'mg / 2300mg':v+'g / '+c.g+'g';
+    document.getElementById('gn-'+k).textContent=k==='cal'?v+' / 2000':k==='sodium'?v+'mg / 2300mg':k==='sugar'?v+'g / 36g (AHA limit)':v+'g / '+c.g+'g';
   });
   var pf=document.getElementById('pfw');
   if(t.cal===0){pf.innerHTML='<div class="pc pend">Log a meal to see status</div>';}
@@ -1010,7 +1017,24 @@ function renderHistory(){var days=allDays(),el=document.getElementById('hist-lis
 
 // ── Trends ─────────────────────────────────────────────────────────
 function setTP(n,el){tDays=n;document.querySelectorAll('.sta').forEach(function(t){t.classList.remove('active');});el.classList.add('active');renderTrends();}
-function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'🔥',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:avg.carbs,g:175,u:'g',mn:false},{i:'🌿',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=175;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd2 '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['🥇','🥈','🥉','4️⃣','5️⃣'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse(),mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data).cal;}).concat([2000]));document.getElementById('tc').innerHTML=cd.map(function(d){var tc=dTot(d.data).cal,p=Math.round((tc/mx)*100),cls=tc>2000?'o':(tc>1700?'w':''),lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});return'<div class="cbr3"><div class="cbd">'+lb+'</div><div class="cbw"><div class="cbf'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="cbv">'+Math.round(tc)+'</div></div>';}).join('');}
+function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'🔥',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:avg.carbs,g:175,u:'g',mn:false},{i:'🌿',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=175;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd2 '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['🥇','🥈','🥉','4️⃣','5️⃣'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse();
+  function mkChart(elId,key,goal,overCls,warnThresh){
+    var mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data)[key]||0;}).concat([goal]));
+    document.getElementById(elId).innerHTML=cd.map(function(d){
+      var v=Math.round(dTot(d.data)[key]||0),p=Math.round((v/mx)*100);
+      var cls=v>goal?overCls:(warnThresh&&v>warnThresh?'w':'');
+      var lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
+      var unit=key==='sodium'?'mg':'g';
+      return'<div class="cbr3"><div class="cbd">'+lb+'</div><div class="cbw"><div class="cbf'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="cbv">'+v+(key==='cal'?'':unit)+'</div></div>';
+    }).join('');
+  }
+  mkChart('tc','cal',2000,'o',1700);
+  mkChart('tcarb','carbs',175,'o',155);
+  mkChart('tfib','fiber',28,'','');
+  mkChart('tprot','protein',150,'','100');
+  mkChart('tsod','sodium',2300,'o',1800);
+  mkChart('tsug','sugar',36,'w',25);
+}
 </script>
 </body>
 </html>
