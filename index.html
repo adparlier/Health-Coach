@@ -898,78 +898,82 @@ function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDat
   function mkChart(elId,key,goal,overCls,warnThresh){
     var el=document.getElementById(elId);if(!el)return;
     var unit=key==='cal'?'':key==='sodium'?'mg':'g';
-    // Y axis: 0 to goal + 25%
-    var yMax=Math.round(goal*1.25);
-    // Also expand if any value exceeds yMax
-    var maxVal=Math.max.apply(null,cd.map(function(d){return dTot(d.data)[key]||0;}));
-    if(maxVal>yMax)yMax=Math.round(maxVal*1.1);
-    var detail=document.createElement('div');detail.className='vday-detail';
-    var activeBar=null;
-    // Chart container with relative positioning for goal line
-    var chartWrap=document.createElement('div');
-    chartWrap.style.cssText='position:relative;width:100%;';
-    // Goal line — positioned as % from bottom
-    var goalPct=(goal/yMax)*100;
-    var gl=document.createElement('div');
-    gl.style.cssText='position:absolute;left:0;right:0;bottom:calc('+goalPct.toFixed(1)+'% + 18px);border-top:2px dashed #0d6eab;pointer-events:none;z-index:2;';
-    // Goal label
-    var glbl=document.createElement('div');
-    glbl.style.cssText='position:absolute;right:0;bottom:calc('+goalPct.toFixed(1)+'% + 20px);font-size:8px;color:#0d6eab;font-weight:700;z-index:2;';
-    glbl.textContent='Goal: '+goal+unit;
-    var chartDiv=document.createElement('div');chartDiv.className='vchart';
-    cd.forEach(function(d){
+    var isMin=(key==='fiber'||key==='protein');
+    // Y max = goal + 25%, or max value if higher
+    var maxVal=Math.max.apply(null,cd.map(function(d){return dTot(d.data)[key]||0;}).concat([0]));
+    var yMax=Math.max(Math.round(goal*1.25), Math.round(maxVal*1.1), goal+10);
+    // SVG dimensions
+    var W=el.offsetWidth||300, H=180;
+    var padL=42, padR=10, padT=16, padB=36;
+    var chartW=W-padL-padR, chartH=H-padT-padB;
+    var n=cd.length, barW=Math.max(4, Math.floor((chartW/n)*0.65));
+    var gap=(chartW - barW*n)/(n+1);
+    // Y axis ticks
+    var ticks=5;
+    var tickLines='', tickLabels='';
+    for(var ti=0;ti<=ticks;ti++){
+      var tv=Math.round((yMax/ticks)*ti);
+      var ty=padT+chartH-Math.round((tv/yMax)*chartH);
+      tickLines+='<line x1="'+(padL-4)+'" y1="'+ty+'" x2="'+padL+'" y2="'+ty+'" stroke="var(--bd)" stroke-width="1"/>';
+      tickLines+='<line x1="'+padL+'" y1="'+ty+'" x2="'+(padL+chartW)+'" y2="'+ty+'" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="2,3"/>';
+      tickLabels+='<text x="'+(padL-6)+'" y="'+(ty+3)+'" text-anchor="end" font-size="8" fill="var(--t3)" font-family="Nunito,sans-serif">'+tv+unit+'</text>';
+    }
+    // Goal line
+    var goalY=padT+chartH-Math.round((goal/yMax)*chartH);
+    var goalLine='<line x1="'+padL+'" y1="'+goalY+'" x2="'+(padL+chartW)+'" y2="'+goalY+'" stroke="#0d6eab" stroke-width="1.5" stroke-dasharray="4,3"/>';
+    var goalLbl='<text x="'+(padL+chartW-2)+'" y="'+(goalY-3)+'" text-anchor="end" font-size="8" fill="#0d6eab" font-family="Nunito,sans-serif" font-weight="700">Goal</text>';
+    // Bars and x labels
+    var bars='', xLabels='', hitAreas='';
+    var dayDetails=[];
+    cd.forEach(function(d,i){
       var v=Math.round(dTot(d.data)[key]||0);
-      // Height as % of yMax, min 1px so bar is visible
-      var pct=(v/yMax)*100;
+      var bh=Math.max(v>0?Math.round((v/yMax)*chartH):0, v>0?2:0);
+      var bx=padL+gap+(barW+gap)*i;
+      var by=padT+chartH-bh;
       var lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
-      // Color logic matching main page
-      var barColor;
-      var isMin=(key==='fiber'||key==='protein'); // goals to hit, not limits
-      if(isMin){
-        if(v>=goal)barColor='#0d6eab'; // blue = met goal
-        else if(v>=(goal*0.7))barColor='#c89000'; // gold = getting close
-        else barColor='#c0392b'; // red = too low
-      } else {
-        if(v<=goal*0.85)barColor='#0d6eab'; // blue = good
-        else if(v<=goal)barColor='#c89000'; // gold = approaching
-        else barColor='#c0392b'; // red = over
-      }
-      var wrap=document.createElement('div');wrap.className='vbar-wrap';
-      var valLbl=document.createElement('div');valLbl.className='vbar-val';
-      valLbl.textContent=v>0?v+unit:'';
-      var bar=document.createElement('div');bar.className='vbar';
-      bar.style.cssText='height:'+Math.max(pct,0.5)+'%;background:'+barColor+';width:100%;border-radius:3px 3px 0 0;min-height:'+(v>0?'3':'1')+'px;';
-      var dateLbl=document.createElement('div');dateLbl.className='vbar-lbl';dateLbl.textContent=lb;
-      wrap.appendChild(valLbl);wrap.appendChild(bar);wrap.appendChild(dateLbl);
-      (function(dayData,dayDate,b){
-        wrap.onclick=function(){
-          if(activeBar===b&&detail.classList.contains('open')){detail.classList.remove('open');activeBar=null;return;}
-          activeBar=b;
-          var t2=dTot(dayData);
-          var dl=new Date(dayDate).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-          detail.classList.add('open');
-          detail.innerHTML='<div class="vday-title">'+dl+'</div>'+
-            '<div class="vday-row"><span>🔥 Calories</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.cal)+'</span></div>'+
-            '<div class="vday-row"><span>🍞 Carbs</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.carbs)+'g</span></div>'+
-            '<div class="vday-row"><span>🌿 Fiber</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.fiber)+'g</span></div>'+
-            '<div class="vday-row"><span>💪 Protein</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.protein)+'g</span></div>'+
-            '<div class="vday-row"><span>🧂 Sodium</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.sodium)+'mg</span></div>'+
-            '<div class="vday-row"><span>🍬 Added Sugar</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.sugar||0)+'g</span></div>';
-        };
-      })(d.data,d.date,bar);
-      chartDiv.appendChild(wrap);
+      // Color
+      var col;
+      if(isMin){col=v>=goal?'#0d6eab':(v>=(goal*0.7)?'#c89000':'#c0392b');}
+      else{col=v<=goal*0.85?'#0d6eab':(v<=goal?'#c89000':'#c0392b');}
+      bars+='<rect x="'+bx+'" y="'+by+'" width="'+barW+'" height="'+bh+'" fill="'+col+'" rx="2"/>';
+      // Value on top of bar if fits
+      if(bh>12){bars+='<text x="'+(bx+barW/2)+'" y="'+(by-2)+'" text-anchor="middle" font-size="7" fill="var(--t2)" font-family="Nunito,sans-serif" font-weight="700">'+v+unit+'</text>';}
+      xLabels+='<text x="'+(bx+barW/2)+'" y="'+(padT+chartH+12)+'" text-anchor="middle" font-size="7" fill="var(--t3)" font-family="Nunito,sans-serif">'+lb+'</text>';
+      // Invisible hit area for tap
+      hitAreas+='<rect class="vhit" x="'+bx+'" y="'+padT+'" width="'+barW+'" height="'+chartH+'" fill="transparent" data-idx="'+i+'"/>';
+      dayDetails.push(d);
     });
-    // Y axis labels
-    var yAxis=document.createElement('div');
-    yAxis.style.cssText='display:flex;justify-content:space-between;font-size:8px;color:var(--t3);font-weight:600;margin-top:3px;padding:0 2px;';
-    yAxis.innerHTML='<span>0</span><span>'+Math.round(yMax/2)+unit+'</span><span>'+yMax+unit+'</span>';
-    chartWrap.appendChild(gl);
-    chartWrap.appendChild(glbl);
-    chartWrap.appendChild(chartDiv);
-    el.innerHTML='';
-    el.appendChild(chartWrap);
-    el.appendChild(yAxis);
+    // Axes
+    var axes='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(padT+chartH)+'" stroke="var(--t2)" stroke-width="1.5"/>'; // Y axis
+    axes+='<line x1="'+padL+'" y1="'+(padT+chartH)+'" x2="'+(padL+chartW)+'" y2="'+(padT+chartH)+'" stroke="var(--t2)" stroke-width="1.5"/>'; // X axis
+    // Origin label
+    axes+='<text x="'+(padL-4)+'" y="'+(padT+chartH+10)+'" text-anchor="end" font-size="8" fill="var(--t3)" font-family="Nunito,sans-serif">0</text>';
+    var svg='<svg width="100%" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'+tickLines+tickLabels+goalLine+goalLbl+bars+axes+xLabels+hitAreas+'</svg>';
+    var detail=document.createElement('div');detail.className='vday-detail';
+    el.innerHTML=svg;
     el.appendChild(detail);
+    // Wire up tap events
+    el.querySelectorAll('.vhit').forEach(function(hit){
+      hit.style.cursor='pointer';
+      hit.addEventListener('click',function(){
+        var i=parseInt(this.getAttribute('data-idx'));
+        var d=dayDetails[i];
+        var t2=dTot(d.data);
+        var dl=new Date(d.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+        if(detail.classList.contains('open')&&detail.getAttribute('data-day')===String(i)){
+          detail.classList.remove('open');detail.removeAttribute('data-day');return;
+        }
+        detail.setAttribute('data-day',i);
+        detail.classList.add('open');
+        detail.innerHTML='<div class="vday-title">'+dl+'</div>'+
+          '<div class="vday-row"><span>🔥 Calories</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.cal)+'</span></div>'+
+          '<div class="vday-row"><span>🍞 Carbs</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.carbs)+'g</span></div>'+
+          '<div class="vday-row"><span>🌿 Fiber</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.fiber)+'g</span></div>'+
+          '<div class="vday-row"><span>💪 Protein</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.protein)+'g</span></div>'+
+          '<div class="vday-row"><span>🧂 Sodium</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.sodium)+'mg</span></div>'+
+          '<div class="vday-row"><span>🍬 Added Sugar</span><span style="font-weight:700;color:var(--al)">'+Math.round(t2.sugar||0)+'g</span></div>';
+      });
+    });
   }
   mkChart('tc','cal',2000,'o','1700');
   mkChart('tcarb','carbs',175,'o','155');
