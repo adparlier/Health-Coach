@@ -897,21 +897,48 @@ function setTP(n,el){tDays=n;document.querySelectorAll('.sta').forEach(function(
 function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDate()-tDays);var fil=days.filter(function(d){return new Date(d.date)>=cut&&Object.values(d.data).some(function(arr){return arr.length>0;});});var nd='<div class="nt2">No data yet for this period.</div>';if(!fil.length){['ta','tg','tf','tc'].forEach(function(id){document.getElementById(id).innerHTML=nd;});return;}var tots=fil.map(function(d){return dTot(d.data);}),avg={cal:0,carbs:0,fiber:0,protein:0,sodium:0};tots.forEach(function(t){Object.keys(avg).forEach(function(k){avg[k]+=t[k];});});Object.keys(avg).forEach(function(k){avg[k]=Math.round(avg[k]/tots.length);});document.getElementById('ta').innerHTML=[{i:'🔥',l:'Calories',v:avg.cal,g:2000,u:'',mn:false},{i:'🍞',l:'Carbs',v:avg.carbs,g:175,u:'g',mn:false},{i:'🌿',l:'Fiber',v:avg.fiber,g:28,u:'g',mn:true},{i:'💪',l:'Protein',v:avg.protein,g:150,u:'g',mn:true},{i:'🧂',l:'Sodium',v:avg.sodium,g:2300,u:'mg',mn:false}].map(function(g){var p=Math.min((g.v/g.g)*100,100),cls=bc(g.v,g.g,g.mn);return'<div class="tr"><div class="ti">'+g.i+'</div><div class="tl">'+g.l+'</div><div class="tbw"><div class="tb'+(cls?' '+cls:'')+'" style="width:'+p+'%"></div></div><div class="tv">'+g.v+g.u+' avg</div></div>';}).join('');var gks=[{l:'Calories',ck:function(t){return t.cal<=2000;}},{l:'Carbs',ck:function(t){return t.carbs<=175;}},{l:'Fiber',ck:function(t){return t.fiber>=20;}},{l:'Protein',ck:function(t){return t.protein>=100;}},{l:'Sodium',ck:function(t){return t.sodium<=2300;}}];document.getElementById('tg').innerHTML=gks.map(function(g){var hits=tots.map(function(t){return g.ck(t);}),hc=hits.filter(Boolean).length,pct=Math.round((hc/hits.length)*100),dots=hits.map(function(h){return'<div class="gd2 '+(h?'hit':'miss')+'"></div>';}).join('');return'<div class="gh"><div class="ghl">'+g.l+'</div><div class="ghd">'+dots+'</div><div class="ghp">'+pct+'%</div></div>';}).join('');var fc={};fil.forEach(function(d){MEALS.forEach(function(m){(d.data[m]||[]).forEach(function(f){var k=f.name.toLowerCase().trim();if(!fc[k])fc[k]={name:f.name,count:0};fc[k].count++;});});});var tf=Object.values(fc).sort(function(a,b){return b.count-a.count;}).slice(0,5),med=['🥇','🥈','🥉','4️⃣','5️⃣'];document.getElementById('tf').innerHTML=tf.length?tf.map(function(f,i){return'<div class="tfr"><div class="tfrk">'+med[i]+'</div><div class="tfn">'+f.name+'</div><div class="tfc">x'+f.count+'</div></div>';}).join(''):'<div class="nt2">No data yet.</div>';var cd=fil.slice(0,14).reverse();
   function mkChart(elId,key,goal,overCls,warnThresh){
     var el=document.getElementById(elId);if(!el)return;
-    var mx=Math.max.apply(null,cd.map(function(d){return dTot(d.data)[key]||0;}).concat([goal]));
     var unit=key==='cal'?'':key==='sodium'?'mg':'g';
-    var goalPct=mx>0?Math.round((goal/mx)*100):50;
-    var chartDiv=document.createElement('div');chartDiv.className='vchart';
-    var gl=document.createElement('div');gl.className='vgoal-line';gl.style.bottom=goalPct+'%';chartDiv.appendChild(gl);
+    // Y axis: 0 to goal + 25%
+    var yMax=Math.round(goal*1.25);
+    // Also expand if any value exceeds yMax
+    var maxVal=Math.max.apply(null,cd.map(function(d){return dTot(d.data)[key]||0;}));
+    if(maxVal>yMax)yMax=Math.round(maxVal*1.1);
     var detail=document.createElement('div');detail.className='vday-detail';
     var activeBar=null;
+    // Chart container with relative positioning for goal line
+    var chartWrap=document.createElement('div');
+    chartWrap.style.cssText='position:relative;width:100%;';
+    // Goal line — positioned as % from bottom
+    var goalPct=(goal/yMax)*100;
+    var gl=document.createElement('div');
+    gl.style.cssText='position:absolute;left:0;right:0;bottom:calc('+goalPct.toFixed(1)+'% + 18px);border-top:2px dashed #0d6eab;pointer-events:none;z-index:2;';
+    // Goal label
+    var glbl=document.createElement('div');
+    glbl.style.cssText='position:absolute;right:0;bottom:calc('+goalPct.toFixed(1)+'% + 20px);font-size:8px;color:#0d6eab;font-weight:700;z-index:2;';
+    glbl.textContent='Goal: '+goal+unit;
+    var chartDiv=document.createElement('div');chartDiv.className='vchart';
     cd.forEach(function(d){
       var v=Math.round(dTot(d.data)[key]||0);
-      var pct=mx>0?Math.max(Math.round((v/mx)*100),1):1;
-      var cls=v>goal?overCls:(warnThresh&&v>Number(warnThresh)?'w':'');
+      // Height as % of yMax, min 1px so bar is visible
+      var pct=(v/yMax)*100;
       var lb=new Date(d.date).toLocaleDateString('en-US',{month:'numeric',day:'numeric'});
+      // Color logic matching main page
+      var barColor;
+      var isMin=(key==='fiber'||key==='protein'); // goals to hit, not limits
+      if(isMin){
+        if(v>=goal)barColor='#0d6eab'; // blue = met goal
+        else if(v>=(goal*0.7))barColor='#c89000'; // gold = getting close
+        else barColor='#c0392b'; // red = too low
+      } else {
+        if(v<=goal*0.85)barColor='#0d6eab'; // blue = good
+        else if(v<=goal)barColor='#c89000'; // gold = approaching
+        else barColor='#c0392b'; // red = over
+      }
       var wrap=document.createElement('div');wrap.className='vbar-wrap';
-      var valLbl=document.createElement('div');valLbl.className='vbar-val';valLbl.textContent=v+unit;
-      var bar=document.createElement('div');bar.className='vbar'+(cls?' '+cls:'');bar.style.height=pct+'%';
+      var valLbl=document.createElement('div');valLbl.className='vbar-val';
+      valLbl.textContent=v>0?v+unit:'';
+      var bar=document.createElement('div');bar.className='vbar';
+      bar.style.cssText='height:'+Math.max(pct,0.5)+'%;background:'+barColor+';width:100%;border-radius:3px 3px 0 0;min-height:'+(v>0?'3':'1')+'px;';
       var dateLbl=document.createElement('div');dateLbl.className='vbar-lbl';dateLbl.textContent=lb;
       wrap.appendChild(valLbl);wrap.appendChild(bar);wrap.appendChild(dateLbl);
       (function(dayData,dayDate,b){
@@ -932,7 +959,17 @@ function renderTrends(){var days=allDays(),cut=new Date();cut.setDate(cut.getDat
       })(d.data,d.date,bar);
       chartDiv.appendChild(wrap);
     });
-    el.innerHTML='';el.appendChild(chartDiv);el.appendChild(detail);
+    // Y axis labels
+    var yAxis=document.createElement('div');
+    yAxis.style.cssText='display:flex;justify-content:space-between;font-size:8px;color:var(--t3);font-weight:600;margin-top:3px;padding:0 2px;';
+    yAxis.innerHTML='<span>0</span><span>'+Math.round(yMax/2)+unit+'</span><span>'+yMax+unit+'</span>';
+    chartWrap.appendChild(gl);
+    chartWrap.appendChild(glbl);
+    chartWrap.appendChild(chartDiv);
+    el.innerHTML='';
+    el.appendChild(chartWrap);
+    el.appendChild(yAxis);
+    el.appendChild(detail);
   }
   mkChart('tc','cal',2000,'o','1700');
   mkChart('tcarb','carbs',175,'o','155');
