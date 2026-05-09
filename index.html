@@ -263,7 +263,7 @@ input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(
     <div class="gr"><span class="gl">Sodium</span><div class="gt"><div class="gf" id="gf-sodium" style="width:0%"></div></div><span class="gn" id="gn-sodium">0 / 2300mg</span></div>
   </div>
   <div class="sec"><div class="sh2"><span class="st">Status</span></div><div class="pw" id="pfw"><div class="pc pend">Log a meal to see status</div></div></div>
-  <div class="sec" style="margin-bottom:80px;"><div class="sh2"><span class="st">Today's Meals</span></div><div id="mc"></div></div>
+  <div class="sec" style="margin-bottom:80px;"><div class="sh2"><span class="st">Today's Meals</span><button class="cb" onclick="showDatePicker()">+ Past Day</button></div><div id="mc"></div></div>
 </div>
 
 <div class="page" id="page-suggest">
@@ -324,7 +324,9 @@ function saveDay(){
 function getHist(){var s=localStorage.getItem('nl_h');return s?JSON.parse(s):{};}
 function addHist(f){var h=getHist(),k=f.name.toLowerCase().trim();h[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g',count:(h[k]?h[k].count+1:1),lastUsed:new Date().toISOString()};localStorage.setItem('nl_h',JSON.stringify(h));}
 function getFavs(){var s=localStorage.getItem('nl_f');return s?JSON.parse(s):{};}
-function toggleFav(k,f){var fv=getFavs();if(fv[k])delete fv[k];else fv[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g'};localStorage.setItem('nl_f',JSON.stringify(fv));}
+function saveFavsToCloud(favs){if(!syncURL)return;fetch(syncURL,{method:'POST',body:JSON.stringify({action:'saveFavs',favs:favs})}).catch(function(){});}
+function loadFavsFromCloud(cb){if(!syncURL){cb();return;}fetch(syncURL,{method:'POST',body:JSON.stringify({action:'loadFavs'})}).then(function(r){return r.json();}).then(function(data){if(data.status==='ok'&&data.favs){localStorage.setItem('nl_f',JSON.stringify(data.favs));}cb();}).catch(function(){cb();});}
+function toggleFav(k,f,meal){var fv=getFavs();if(fv[k])delete fv[k];else fv[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g',meal:meal||'',count:0};localStorage.setItem('nl_f',JSON.stringify(fv));saveFavsToCloud(fv);}
 function isFav(k){return !!getFavs()[k];}
 function getSyncURL(){return localStorage.getItem('nl_sync')||'https://script.google.com/macros/s/AKfycbwoCezt8eRCmcNdtXv_PCocoNQ3dEmFsIUxhB5Xg5di8OgXJtO_uO5iINsAs1999c0/exec';}
 function saveSyncURL(u){localStorage.setItem('nl_sync',u);syncURL=u;}
@@ -397,10 +399,7 @@ function showSyncSetup(){
 // ── Init ─────────────────────────────────────────────────────────
 document.getElementById('dp').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 syncURL=getSyncURL();
-loadDay();
-renderAll();
-updateSyncBar();
-syncNow();
+loadFavsFromCloud(function(){loadDay();renderAll();updateSyncBar();syncNow();});
 
 // ── Page nav ─────────────────────────────────────────────────────
 function showPage(n,btn){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('active');});document.getElementById('page-'+n).classList.add('active');btn.classList.add('active');document.getElementById('fab').className=n==='log'?'fab':'fab hid';if(n==='suggest')renderSuggest();if(n==='history')renderHistory();if(n==='trends')renderTrends();}
@@ -447,8 +446,46 @@ function renderAll(){
 }
 
 // ── Modal ─────────────────────────────────────────────────────────
-function openModal(){document.getElementById('ov').classList.add('open');showMS();}
-function closeModal(){stopScan();document.getElementById('ov').classList.remove('open');selFood=null;}
+
+function showDatePicker(){
+  var mb=cm2();
+  aTitle(mb,'Log to Past Day','Add food you forgot to log');
+  var fw=document.createElement('div');fw.className='fw';
+  var lbl=document.createElement('label');lbl.className='fl2';lbl.textContent='Select date:';
+  var inp=document.createElement('input');
+  inp.type='date';
+  inp.style.cssText='width:100%;background:var(--sf2);border:2px solid var(--bd);border-radius:10px;padding:11px 13px;color:var(--tx);font-family:Nunito,sans-serif;font-size:14px;outline:none;';
+  // Default to yesterday
+  var yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  inp.value=yesterday.toISOString().split('T')[0];
+  inp.max=new Date().toISOString().split('T')[0];
+  fw.appendChild(lbl);fw.appendChild(inp);mb.appendChild(fw);
+  mb.appendChild(mkBtn('pri','Log Food for This Day \u2192',function(){
+    var d=new Date(inp.value+'T12:00:00');
+    activeDate='nl_'+d.toDateString();
+    document.getElementById('ov').classList.add('open');
+    showMS();
+  }));
+  mb.appendChild(mkBtn('sec','Cancel',closeModal));
+  document.getElementById('ov').classList.add('open');
+}
+
+function openModal(dateKey){
+  activeDate = dateKey || tk();
+  document.getElementById('ov').classList.add('open');
+  showMS();
+}
+var activeDate = tk();
+function getActiveLog(){
+  if(activeDate === tk()) return log;
+  var s=localStorage.getItem(activeDate);
+  return s?JSON.parse(s):{Breakfast:[],Lunch:[],Dinner:[],Snack:[]};
+}
+function saveActiveLog(l){
+  if(activeDate === tk()){log=l;saveDay();}
+  else{localStorage.setItem(activeDate,JSON.stringify(l));if(syncURL){fetch(syncURL,{method:'POST',body:JSON.stringify({action:'save',dateKey:activeDate,log:l})}).catch(function(){});}}
+}
+function closeModal(){stopScan();document.getElementById('ov').classList.remove('open');selFood=null;activeDate=tk();}
 document.getElementById('ov').addEventListener('click',function(e){if(e.target===document.getElementById('ov'))closeModal();});
 function cm2(){var mb=document.getElementById('mb');mb.innerHTML='';return mb;}
 function aTitle(mb,title,sub){var h=document.createElement('div');h.style.cssText='font-family:Fraunces,serif;font-size:22px;color:var(--ac);margin-bottom:4px;';h.textContent=title;mb.appendChild(h);if(sub){var s=document.createElement('p');s.style.cssText='font-size:13px;color:var(--t2);margin-bottom:16px;line-height:1.4;';s.textContent=sub;mb.appendChild(s);}}
@@ -461,7 +498,7 @@ function showMS(){
   aTitle(mb,'Log Food','Choose how to add your meal');
   aMTabs(mb);
   var gr=document.createElement('div');gr.className='mgr3';
-  [{i:'⏰',l:'Recent & Favs',fn:function(){showFH('aldi');}},{i:'✏️',l:'Enter Manually',fn:showManual},{i:'⭐',l:'Favorites',fn:function(){showFH('favs');}}].forEach(function(item){
+  [{i:'⏰',l:'Recent & Favs',fn:function(){showFH('recent');}},{i:'✏️',l:'Enter Manually',fn:showManual},{i:'⭐',l:'Favorites',fn:function(){showFH('favs');}}].forEach(function(item){
     var btn=document.createElement('div');btn.className='mbt';
     btn.innerHTML='<div class="mi">'+item.i+'</div><div class="mlb">'+item.l+'</div>';
     btn.onclick=item.fn;gr.appendChild(btn);
@@ -584,48 +621,24 @@ function showRes(foods){
 }
 
 
-var ALDI_STAPLES = [
-  {name:'Salmon Fillet (6oz)',brand:'Aldi / Seasons Choice',cal:280,carbs:0,fiber:0,protein:34,sodium:115,sugar:0,servingSize:170,servingUnit:'g'},
-  {name:'Friendly Farms Plain Greek Yogurt',brand:'Aldi / Friendly Farms',cal:100,carbs:7,fiber:0,protein:17,sodium:65,sugar:6,servingSize:170,servingUnit:'g'},
-  {name:'Friendly Farms Vanilla Greek Yogurt',brand:'Aldi / Friendly Farms',cal:140,carbs:20,fiber:0,protein:11,sodium:75,sugar:19,servingSize:170,servingUnit:'g'},
-  {name:'Southern Grove Almonds Roasted Salted',brand:'Aldi / Southern Grove',cal:170,carbs:6,fiber:3,protein:6,sodium:95,sugar:1,servingSize:28,servingUnit:'g'},
-  {name:'Rotisserie Chicken',brand:'Aldi',cal:180,carbs:0,fiber:0,protein:26,sodium:440,sugar:0,servingSize:113,servingUnit:'g'},
-  {name:'Eggs Large (2 eggs)',brand:'Aldi / Goldhen',cal:140,carbs:0,fiber:0,protein:12,sodium:125,sugar:0,servingSize:100,servingUnit:'g'},
-  {name:'Peanut Butter (2 tbsp)',brand:'Aldi / Peanut Delight',cal:190,carbs:7,fiber:2,protein:8,sodium:150,sugar:3,servingSize:32,servingUnit:'g'},
-  {name:'Whole Grain Bread (1 slice)',brand:'Aldi / LOven Fresh',cal:90,carbs:17,fiber:2,protein:4,sodium:140,sugar:2,servingSize:38,servingUnit:'g'},
-  {name:'Cheerios',brand:'General Mills',cal:140,carbs:29,fiber:4,protein:5,sodium:190,sugar:2,servingSize:39,servingUnit:'g'},
-  {name:'Ground Beef 93% Lean (4oz)',brand:'Aldi / Never Any',cal:150,carbs:0,fiber:0,protein:25,sodium:75,sugar:0,servingSize:113,servingUnit:'g'},
-  {name:'Chicken Breast (6oz)',brand:'Aldi / Never Any',cal:185,carbs:0,fiber:0,protein:40,sodium:85,sugar:0,servingSize:170,servingUnit:'g'},
-  {name:'Sweet Potato (medium)',brand:'Fresh',cal:103,carbs:24,fiber:4,protein:2,sodium:41,sugar:7,servingSize:130,servingUnit:'g'},
-  {name:'Green Beans (1 cup)',brand:'Fresh',cal:31,carbs:7,fiber:3,protein:2,sodium:6,sugar:3,servingSize:100,servingUnit:'g'},
-  {name:'Brown Rice (1 cup cooked)',brand:'Generic',cal:216,carbs:45,fiber:4,protein:5,sodium:10,sugar:0,servingSize:202,servingUnit:'g'},
-  {name:'Black Beans (half cup)',brand:'Canned',cal:110,carbs:20,fiber:7,protein:7,sodium:240,sugar:0,servingSize:130,servingUnit:'g'},
-  {name:'Olive Oil (1 tbsp)',brand:'Aldi / Carlini',cal:120,carbs:0,fiber:0,protein:0,sodium:0,sugar:0,servingSize:14,servingUnit:'g'},
-  {name:'Banana (medium)',brand:'Fresh',cal:105,carbs:27,fiber:3,protein:1,sodium:1,sugar:14,servingSize:118,servingUnit:'g'},
-  {name:'Aldi Spaghetti (2oz dry)',brand:'Aldi / Reggano',cal:200,carbs:41,fiber:2,protein:7,sodium:0,sugar:1,servingSize:56,servingUnit:'g'},
-  {name:'Raw Crunch Bar',brand:'Raw Crunch (Indian Trail)',cal:190,carbs:17,fiber:3,protein:6,sodium:45,sugar:8,servingSize:45,servingUnit:'g'},
-  {name:'Protein Shake',brand:'Generic / Premier Protein',cal:160,carbs:5,fiber:1,protein:30,sodium:390,sugar:1,servingSize:325,servingUnit:'ml'},
-  {name:'Metamucil Capsules (5 caps)',brand:'Metamucil',cal:5,carbs:2,fiber:2,protein:0,sodium:0,sugar:0,servingSize:5,servingUnit:'caps'},
-];
 
 // ── Recent & Favs ─────────────────────────────────────────────────
 function showFH(tab){
   var hist=getHist(),favs=getFavs();
-  var isAldi=tab==='aldi';
-  var histArr=Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);});var items=isAldi?ALDI_STAPLES:(tab==='favs'?Object.values(favs):histArr);
-  var mb=cm2();aTitle(mb,isAldi?'My Aldi Staples':tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);
+  var histArr=Object.values(hist).sort(function(a,b){return new Date(b.lastUsed)-new Date(a.lastUsed);});
+  var items=tab==='favs'?Object.values(favs):histArr;
+  var mb=cm2();aTitle(mb,tab==='favs'?'Favorites':'Recent Foods','Tap to add');aMTabs(mb);
   var tabs=document.createElement('div');tabs.className='stb';
   var r=document.createElement('button');r.className='sta'+(tab==='recent'?' active':'');r.textContent='⏰ Recent';r.onclick=function(){showFH('recent');};
   var f2=document.createElement('button');f2.className='sta'+(tab==='favs'?' active':'');f2.textContent='⭐ Favorites';f2.onclick=function(){showFH('favs');};
-  var a=document.createElement('button');a.className='sta'+(tab==='aldi'?' active':'');a.textContent='🛒 My Aldi';a.onclick=function(){showFH('aldi');};
-  tabs.appendChild(r);tabs.appendChild(f2);tabs.appendChild(a);mb.appendChild(tabs);
+  tabs.appendChild(r);tabs.appendChild(f2);mb.appendChild(tabs);
   if(!items.length){var em=document.createElement('div');em.className='ehi';em.textContent=tab==='favs'?'No favorites yet':'No history yet';mb.appendChild(em);}
   else{items.forEach(function(f){
     var k=f.name.toLowerCase().trim(),row=document.createElement('div');row.className='hi';
     var left=document.createElement('div');left.className='hl2';
     left.innerHTML='<div class="hn">'+f.name+'</div>'+(f.brand?'<div class="hb">'+f.brand+'</div>':'')+'<div class="hm"><span>🔥 '+f.cal+' cal</span><span>🍞 '+f.carbs+'g</span><span>🌿 '+f.fiber+'g</span><span>💪 '+f.protein+'g</span></div>';
     var right=document.createElement('div');right.className='hri';
-    right.innerHTML='<div class="hcc">'+f.cal+'</div>';
+    right.innerHTML='<div class="hcc">'+f.cal+'</div>'+(f.meal?'<div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;">'+f.meal+'</div>':'');
     var fb=document.createElement('button');fb.className='fvb';fb.textContent=isFav(k)?'⭐':'☆';
     (function(fk,food,btn){btn.onclick=function(e){e.stopPropagation();toggleFav(fk,food);btn.textContent=isFav(fk)?'⭐':'☆';};})(k,f,fb);
     right.appendChild(fb);
@@ -808,8 +821,13 @@ function addManual(){
     sugar:parseInt(document.getElementById('m-sugar').value)||0,
     servingSize:1,servingUnit:'serving',manual:true
   };
-  log[selMeal].push(entry);
-  addHist(entry);saveDay();renderAll();closeModal();
+  var l=getActiveLog();
+  if(!l[selMeal])l[selMeal]=[];
+  l[selMeal].push(entry);
+  addHist(entry);saveActiveLog(l);
+  if(activeDate===tk())renderAll();
+  closeModal();
+  if(activeDate!==tk()){alert('Added to '+selMeal+' on '+new Date(activeDate).toLocaleDateString('en-US',{weekday:"short",month:"short",day:"numeric"}));}
 }
 
 // ── Confirm & Add ─────────────────────────────────────────────────
@@ -873,7 +891,14 @@ function addFood(){
   if(!selFood)return;
   var si=document.getElementById('svi'),s=si?parseFloat(si.value)||1:1,f=selFood;
   var entry={name:f.name,brand:f.brand||'',cal:Math.round(f.cal*s),carbs:Math.round(f.carbs*s),fiber:Math.round(f.fiber*s),protein:Math.round(f.protein*s),sodium:Math.round(f.sodium*s),sugar:Math.round((f.sugar||0)*s),scanned:f.scanned||false};
-  log[selMeal].push(entry);addHist(entry);saveDay();renderAll();closeModal();
+  var l=getActiveLog();
+  if(!l[selMeal])l[selMeal]=[];
+  l[selMeal].push(entry);
+  addHist(entry);
+  saveActiveLog(l);
+  if(activeDate===tk())renderAll();
+  closeModal();
+  if(activeDate!==tk()){alert('Added to '+selMeal+' on '+new Date(activeDate).toLocaleDateString('en-US',{weekday:"short",month:"short",day:"numeric"}));}
 }
 function showLoad(msg){var mb=cm2();var t=document.createElement('div');t.style.cssText='font-family:Fraunces,serif;font-size:22px;color:var(--ac);margin-bottom:4px;';t.textContent='One moment...';mb.appendChild(t);var w=document.createElement('div');w.className='lw';w.innerHTML='<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div>'+msg+'</div>';mb.appendChild(w);}
 
