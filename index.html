@@ -322,7 +322,9 @@ function saveDay(){
   if(syncURL) syncToSheets();
 }
 function getHist(){var s=localStorage.getItem('nl_h');return s?JSON.parse(s):{};}
-function addHist(f){var h=getHist(),k=f.name.toLowerCase().trim();h[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g',count:(h[k]?h[k].count+1:1),lastUsed:new Date().toISOString()};localStorage.setItem('nl_h',JSON.stringify(h));}
+function addHist(f){var h=getHist(),k=f.name.toLowerCase().trim();h[k]={name:f.name,brand:f.brand||'',cal:f.cal,carbs:f.carbs,fiber:f.fiber,protein:f.protein,sodium:f.sodium,sugar:f.sugar||0,servingSize:f.servingSize||100,servingUnit:f.servingUnit||'g',count:(h[k]?h[k].count+1:1),lastUsed:new Date().toISOString()};localStorage.setItem('nl_h',JSON.stringify(h));saveHistToCloud(h);}
+function saveHistToCloud(h){if(!syncURL)return;fetch(syncURL,{method:'POST',body:JSON.stringify({action:'saveHist',hist:h})}).catch(function(){});}
+function loadHistFromCloud(cb){if(!syncURL){cb();return;}fetch(syncURL,{method:'POST',body:JSON.stringify({action:'loadHist'})}).then(function(r){return r.json();}).then(function(data){if(data.status==='ok'&&data.hist){localStorage.setItem('nl_h',JSON.stringify(data.hist));}cb();}).catch(function(){cb();});}
 function getFavs(){var s=localStorage.getItem('nl_f');return s?JSON.parse(s):{};}
 function saveFavsToCloud(favs){if(!syncURL)return;fetch(syncURL,{method:'POST',body:JSON.stringify({action:'saveFavs',favs:favs})}).catch(function(){});}
 function loadFavsFromCloud(cb){if(!syncURL){cb();return;}fetch(syncURL,{method:'POST',body:JSON.stringify({action:'loadFavs'})}).then(function(r){return r.json();}).then(function(data){if(data.status==='ok'&&data.favs){localStorage.setItem('nl_f',JSON.stringify(data.favs));}cb();}).catch(function(){cb();});}
@@ -399,7 +401,7 @@ function showSyncSetup(){
 // ── Init ─────────────────────────────────────────────────────────
 document.getElementById('dp').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 syncURL=getSyncURL();
-loadFavsFromCloud(function(){loadDay();renderAll();updateSyncBar();syncNow();});
+loadFavsFromCloud(function(){loadHistFromCloud(function(){loadDay();renderAll();updateSyncBar();syncNow();});});
 
 // ── Page nav ─────────────────────────────────────────────────────
 function showPage(n,btn){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});document.querySelectorAll('.nt').forEach(function(t){t.classList.remove('active');});document.getElementById('page-'+n).classList.add('active');btn.classList.add('active');document.getElementById('fab').className=n==='log'?'fab':'fab hid';if(n==='suggest')renderSuggest();if(n==='history')renderHistory();if(n==='trends')renderTrends();}
